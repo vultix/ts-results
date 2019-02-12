@@ -1,0 +1,14 @@
+{
+  "name": "ts-results",
+  "version": "1.0.0",
+  "description": "A typescript implementation of Rust's Result object.",
+  "main": "lib.js",
+  "keywords": ["typescript", "rust", "errors", "result"],
+  "author": "Aidan Grant",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vultix/ts-result"
+  },
+  "readme": "README.md"
+}

@@ -1,0 +1,13 @@
+# Dist
+dist/
+
+#npm
+node_modules/
+
+# Intellij Files
+.idea/encodings.xml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/ts-results.iml
+.idea/workspace.xml

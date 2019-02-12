@@ -1,0 +1,17 @@
+{
+  "name": "ts-results",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "types": "lib.d.ts",
+  "scripts": {
+    "build": "tsc && copyfiles README.md LICENSE src/package.json dist --flat"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "copyfiles": "^2.1.0",
+    "typescript": "^3.3.3"
+  }
+}

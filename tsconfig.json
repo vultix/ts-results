@@ -1,0 +1,22 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "declaration": true,
+    "moduleResolution": "node",
+    "noEmitHelpers": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "baseUrl": "./",
+    "target": "es6",
+    "forceConsistentCasingInFileNames": true
+  },
+  "files": [
+    "src/lib.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
