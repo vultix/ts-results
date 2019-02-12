@@ -12,7 +12,7 @@ $ yarn install ts-results
 
 ## Usage
 ```typescript
-import { Result, Err, Ok } from 'ts-results';
+import { Result, Err, Ok, Results } from 'ts-results';
 ```
 ### Creation
 ```typescript
@@ -76,3 +76,16 @@ badResult.map(num => num + 1, err => new Error('mapped')).unwrap(); // throws Er
 goodResult.map(null, err => new Error('mapped')).unwrap(); // 1
 badResult.map(null, err => new Error('mapped')).unwrap(); // throws Error("mapped")
 ```
+
+### Combining Results
+There may be some cases where we have two or more separate `Result` objects and we want to do something with both values.
+This is handled by using the `Results` function to combine them.
+
+```typescript
+let pizzaResult: Result<Pizza, GetPizzaError> = getPizzaSomehow();
+let toppingsResult: Result<Toppings, GetToppingsError> = getToppingsSomehow();
+
+let result = Results(pizzaResult, toppingsResult); // Result<[Pizza, Toppings], GetPizzaError | GetToppingsError>
+
+let [pizza, toppings] = result.unwrap(); // pizza is a Pizza, toppings is a Toppings.  Could throw GetPizzaError or GetToppingsError.
+``` 

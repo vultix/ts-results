@@ -1,8 +1,9 @@
 {
   "name": "ts-results",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A typescript implementation of Rust's Result object.",
-  "main": "lib.js",
+  "main": "index.js",
+  "types": "index.d.ts",
   "keywords": ["typescript", "rust", "errors", "result"],
   "author": "Aidan Grant",
   "license": "MIT",

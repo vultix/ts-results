@@ -1,11 +1,10 @@
 {
   "name": "ts-results",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "",
-  "main": "index.js",
-  "types": "lib.d.ts",
   "scripts": {
-    "build": "tsc && copyfiles README.md LICENSE src/package.json dist --flat"
+    "build": "npm run clean && tsc && copyfiles README.md LICENSE src/package.json dist --flat",
+    "clean": "rm -rf dist"
   },
   "keywords": [],
   "author": "",
