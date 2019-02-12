@@ -1,6 +1,6 @@
 {
   "name": "ts-results",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A typescript implementation of Rust's Result object.",
   "main": "index.js",
   "types": "index.d.ts",

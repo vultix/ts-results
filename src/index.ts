@@ -1,7 +1,7 @@
 interface BaseResult<T, E> {
-    map<T>(fn: (ok: T) => T): Result<T, E>;
+    map<T1>(fn: (ok: T) => T1): Result<T1, E>;
     map<T2>(fn: null | undefined, errFn: (err: E) => T2): Result<T, T2>;
-    map<T, T2>(fn: (ok: T) => T, errFn: (err: E) => T2): Result<T, T2>;
+    map<T1, T2>(fn: (ok: T) => T1, errFn: (err: E) => T2): Result<T1, T2>;
 
     unwrap(): T;
     expect(msg: string): T;
@@ -21,49 +21,49 @@ interface ErrorResult<T, E> extends BaseResult<T, E>{
 
 export type Result<T, E> = OkResult<T, E> | ErrorResult<T, E>;
 
-class ResultImpl<S, E> {
+class ResultImpl<T, E> {
     public readonly err: boolean;
     public readonly ok: boolean;
-    public readonly val: E | S;
+    public readonly val: E | T;
 
-    map<T>(fn: (ok: S) => T): Result<T, E>
-    map<T2>(fn: null | undefined, errFn: (err: E) => T2): Result<S, E>;
-    map<T, T2>(fn: (ok: S) => T, errFn: (err: E) => T2): Result<T, T2>
-    map<T, T2>(fn?: ((ok: S) => T) | null, errFn?: (err: E) => T2): Result<T | S, T2 | E> {
+    map<T1>(fn: (ok: T) => T1): Result<T1, E>
+    map<T2>(fn: null | undefined, errFn: (err: E) => T2): Result<T, E>;
+    map<T1, T2>(fn: (ok: T) => T1, errFn: (err: E) => T2): Result<T1, T2>
+    map<T1, T2>(fn?: ((ok: T) => T1) | null, errFn?: (err: E) => T2): Result<T1 | T, T2 | E> {
         if (this.ok) {
             if (fn) {
-                return Ok<T, E | T2>(fn(this.val as S));
+                return Ok<T1, E | T2>(fn(this.val as T));
             } else {
-                return Ok<S, E | T2>(this.val as S);
+                return Ok<T, E | T2>(this.val as T);
             }
         } else {
             if (errFn) {
-                return Err<T | S, T2>(errFn(this.val as E));
+                return Err<T1 | T, T2>(errFn(this.val as E));
             } else {
-                return Err<T | S, E>(this.val as E);
+                return Err<T1 | T, E>(this.val as E);
             }
         }
     };
 
-    unwrap(): S {
+    unwrap(): T {
         if (this.ok) {
-            return this.val as S;
+            return this.val as T;
         } else {
             throw this.val as E;
         }
     }
 
-    expect(msg: string): S {
+    expect(msg: string): T {
         if (this.ok) {
-            return this.val as S;
+            return this.val as T;
         } else {
             throw new Error(`${msg} - Error: ${this.val.toString()}`);
         }
     }
 
     constructor(ok: false, val: E)
-    constructor(ok: true, val: S)
-    constructor(ok: boolean, val: E | S) {
+    constructor(ok: true, val: T)
+    constructor(ok: boolean, val: E | T) {
         this.ok = ok;
         this.err = !ok;
         this.val = val;
