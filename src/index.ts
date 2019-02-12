@@ -3,6 +3,12 @@ interface BaseResult<T, E> {
     map<T2>(fn: null | undefined, errFn: (err: E) => T2): Result<T, T2>;
     map<T1, T2>(fn: (ok: T) => T1, errFn: (err: E) => T2): Result<T1, T2>;
 
+    /**
+     * If the result has a value returns that value.  Otherwise returns the passed in value.
+     * @param val the value to replace the error with
+     */
+    else(val: T): T;
+
     unwrap(): T;
     expect(msg: string): T;
 }
@@ -58,6 +64,14 @@ class ResultImpl<T, E> {
             return this.val as T;
         } else {
             throw new Error(`${msg} - Error: ${this.val.toString()}`);
+        }
+    }
+
+    else(val: T): T {
+        if (this.ok) {
+            return this.val as T;
+        } else {
+            return val;
         }
     }
 

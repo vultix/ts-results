@@ -77,6 +77,15 @@ goodResult.map(null, err => new Error('mapped')).unwrap(); // 1
 badResult.map(null, err => new Error('mapped')).unwrap(); // throws Error("mapped")
 ```
 
+### Else
+```typescript
+let goodResult = Ok<number, Error>(1);
+let badResult = Err<number, Error>(new Error("something went wrong"));
+
+goodResult.else(5); // 1
+badResult.else(5); // 5
+```
+
 ### Combining Results
 There may be some cases where we have two or more separate `Result` objects and we want to do something with both values.
 This is handled by using the `Results` function to combine them.
