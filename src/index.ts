@@ -39,7 +39,7 @@ export interface Err<T = never, E = any> extends BaseResult<T, E> {
 
 export type Result<T, E> = Ok<T, E> | Err<T, E>
 
-class ResultImpl<T, E> {
+export class ResultImpl<T, E> {
     public readonly err: boolean;
     public readonly ok: boolean;
     public readonly val: E | T;

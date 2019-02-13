@@ -1,6 +1,6 @@
 import { Observable, ObservableInput, of, OperatorFunction } from 'rxjs';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
-import { Err, Ok, Result } from './index';
+import { Err, Ok, Result, ResultImpl } from './index';
 
 export function resultMap<R extends Result<any, any>, T>(mapper: (val: R['_t']) => T): OperatorFunction<R, Result<T, R['_e']>>
 export function resultMap<R extends Result<any, any>, T2>(mapper: null | undefined, errMapper: (val: R['_e']) => T2): OperatorFunction<R, Result<R['_t'], T2>>
@@ -81,6 +81,13 @@ export function resultSwitchMap<R extends Result<any, any>>(mapper: (val: R['_t'
               } else {
                   return of(result);
               }
+          }),
+          map(result => {
+              if (result instanceof ResultImpl) {
+                  return result as Result<any, any>;
+              } else {
+                  return Ok(result);
+              }
           })
         );
     };
@@ -96,6 +103,13 @@ export function resultMergeMap<R extends Result<any, any>>(mapper: (val: R['_t']
                   return mapper(result.val);
               } else {
                   return of(result);
+              }
+          }),
+          map(result => {
+              if (result instanceof ResultImpl) {
+                  return result as Result<any, any>;
+              } else {
+                  return Ok(result);
               }
           })
         );
