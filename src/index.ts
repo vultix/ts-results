@@ -7,25 +7,37 @@ interface BaseResult<T, E> {
      * If the result has a value returns that value.  Otherwise returns the passed in value.
      * @param val the value to replace the error with
      */
-    else(val: T): T;
+    else<T2>(val: T2): T | T2;
 
     unwrap(): T;
     expect(msg: string): T;
+    asErr(): Result<never, E>;
+    asOk(): Result<T, never>;
+
+    /**
+     * This value doesn't exist at runtime! It's only used so that we can extract the type E given Result<T, E>
+     */
+    _e: E;
+
+    /**
+     * This value doesn't exist at runtime! It's only used so that we can extract the type T given Result<T, E>
+     */
+    _t: T;
 }
 
-interface OkResult<T, E> extends BaseResult<T, E>{
-    readonly ok: false;
-    readonly err: true;
-    readonly val: E;
-}
-
-interface ErrorResult<T, E> extends BaseResult<T, E>{
+export interface Ok<T = any, E = never> extends BaseResult<T, E> {
     readonly ok: true;
     readonly err: false;
     readonly val: T;
 }
 
-export type Result<T, E> = OkResult<T, E> | ErrorResult<T, E>;
+export interface Err<T = never, E = any> extends BaseResult<T, E> {
+    readonly ok: false;
+    readonly err: true;
+    readonly val: E;
+}
+
+export type Result<T, E> = Ok<T, E> | Err<T, E>
 
 class ResultImpl<T, E> {
     public readonly err: boolean;
@@ -38,15 +50,15 @@ class ResultImpl<T, E> {
     map<T1, T2>(fn?: ((ok: T) => T1) | null, errFn?: (err: E) => T2): Result<T1 | T, T2 | E> {
         if (this.ok) {
             if (fn) {
-                return Ok<T1, E | T2>(fn(this.val as T));
+                return Ok(fn(this.val as T));
             } else {
-                return Ok<T, E | T2>(this.val as T);
+                return Ok(this.val as T);
             }
         } else {
             if (errFn) {
-                return Err<T1 | T, T2>(errFn(this.val as E));
+                return Err(errFn(this.val as E));
             } else {
-                return Err<T1 | T, E>(this.val as E);
+                return Err(this.val as E);
             }
         }
     };
@@ -67,12 +79,20 @@ class ResultImpl<T, E> {
         }
     }
 
-    else(val: T): T {
+    else<T2>(val: T2): T | T2 {
         if (this.ok) {
             return this.val as T;
         } else {
             return val;
         }
+    }
+
+    asErr(): Result<never, E> {
+        return this as any;
+    }
+
+    asOk(): Result<T, never> {
+        return this as any;
     }
 
     constructor(ok: false, val: E)
@@ -84,11 +104,11 @@ class ResultImpl<T, E> {
     }
 }
 
-export function Ok<T, E>(val: T): Result<T, E> {
+export function Ok<T, E = never>(val: T): Result<T, E> {
     return new ResultImpl<T, E>(true, val) as Result<T, E>;
 }
 
-export function Err<T, E>(val: E): Result<T, E> {
+export function Err<T= never, E = any>(val: E): Result<T, E> {
     return new ResultImpl<T, E>(false, val) as Result<T, E>;
 }
 
