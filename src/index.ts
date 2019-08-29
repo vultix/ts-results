@@ -1,116 +1,91 @@
-interface BaseResult<T, E> {
-    map<T1>(fn: (ok: T) => T1): Result<T1, E>;
-    map<T2>(fn: null | undefined, errFn: (err: E) => T2): Result<T, T2>;
-    map<T1, T2>(fn: (ok: T) => T1, errFn: (err: E) => T2): Result<T1, T2>;
+export class Err<E> {
+    readonly ok = false;
+    readonly err = true;
+
+    constructor(public readonly val: E) {
+    }
 
     /**
      * If the result has a value returns that value.  Otherwise returns the passed in value.
      * @param val the value to replace the error with
      */
-    else<T2>(val: T2): T | T2;
+    else<T2>(val: T2): T2 {
+        return val;
+    }
 
-    unwrap(): T;
-    expect(msg: string): T;
-    asErr(): Result<never, E>;
-    asOk(): Result<T, never>;
+    expect(msg: string): never {
+        let value = this.val.toString();
+        if (value === '[object Object]') {
+            try {
+                value = JSON.stringify(value);
+            } catch (e) {
 
-    /**
-     * This value doesn't exist at runtime! It's only used so that we can extract the type E given Result<T, E>
-     */
-    _e: E;
-
-    /**
-     * This value doesn't exist at runtime! It's only used so that we can extract the type T given Result<T, E>
-     */
-    _t: T;
-}
-
-export interface Ok<T = any, E = never> extends BaseResult<T, E> {
-    readonly ok: true;
-    readonly err: false;
-    readonly val: T;
-}
-
-export interface Err<T = never, E = any> extends BaseResult<T, E> {
-    readonly ok: false;
-    readonly err: true;
-    readonly val: E;
-}
-
-export type Result<T, E> = Ok<T, E> | Err<T, E>
-
-export class ResultImpl<T, E> {
-    public readonly err: boolean;
-    public readonly ok: boolean;
-    public readonly val: E | T;
-
-    map<T1>(fn: (ok: T) => T1): Result<T1, E>
-    map<T2>(fn: null | undefined, errFn: (err: E) => T2): Result<T, E>;
-    map<T1, T2>(fn: (ok: T) => T1, errFn: (err: E) => T2): Result<T1, T2>
-    map<T1, T2>(fn?: ((ok: T) => T1) | null, errFn?: (err: E) => T2): Result<T1 | T, T2 | E> {
-        if (this.ok) {
-            if (fn) {
-                return Ok(fn(this.val as T));
-            } else {
-                return Ok(this.val as T);
-            }
-        } else {
-            if (errFn) {
-                return Err(errFn(this.val as E));
-            } else {
-                return Err(this.val as E);
             }
         }
-    };
+        throw new Error(`${msg} - Error: ${value}`);
+    }
 
-    unwrap(): T {
-        if (this.ok) {
-            return this.val as T;
-        } else {
-            throw this.val as E;
+    unwrap(): never {
+        let value = this.val.toString();
+        if (value === '[object Object]') {
+            try {
+                value = JSON.stringify(value);
+            } catch (e) {
+
+            }
         }
+        throw new Error(`Tried to unwrap Error: ${value}`);
+    }
+
+    map<T2>(mapper: (val: never) => T2): Err<E> {
+        return this;
+    }
+
+    mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
+        return new Err(mapper(this.val));
+    }
+}
+
+export class Ok<T> {
+    readonly ok = true;
+    readonly err = false;
+
+    constructor(public readonly val: T) {
+    }
+
+    /**
+     * If the result has a value returns that value.  Otherwise returns the passed in value.
+     * @param val the value to replace the error with
+     */
+    else<T2>(val: T2):  T {
+        return this.val;
     }
 
     expect(msg: string): T {
-        if (this.ok) {
-            return this.val as T;
-        } else {
-            throw new Error(`${msg} - Error: ${this.val.toString()}`);
-        }
+        return this.val;
     }
 
-    else<T2>(val: T2): T | T2 {
-        if (this.ok) {
-            return this.val as T;
-        } else {
-            return val;
-        }
+    unwrap(): T {
+        return this.val;
     }
 
-    asErr(): Result<never, E> {
-        return this as any;
+    map<T2>(mapper: (val: T) => T2): Ok<T2> {
+        return new Ok(mapper(this.val));
     }
 
-    asOk(): Result<T, never> {
-        return this as any;
-    }
-
-    constructor(ok: false, val: E)
-    constructor(ok: true, val: T)
-    constructor(ok: boolean, val: E | T) {
-        this.ok = ok;
-        this.err = !ok;
-        this.val = val;
+    mapErr<E2>(mapper: (err: never) => E2): Ok<T> {
+        return this;
     }
 }
 
-export function Ok<T, E = never>(val: T): Result<T, E> {
-    return new ResultImpl<T, E>(true, val) as Result<T, E>;
-}
+export type Result<T, E> = (Ok<T> | Err<E>) & {
+    map<T2>(mapper: (val: T) => T2): Result<T2, E>;
 
-export function Err<T= never, E = any>(val: E): Result<T, E> {
-    return new ResultImpl<T, E>(false, val) as Result<T, E>;
-}
+    mapErr<E2>(mapper: (val: E) => E2): Result<T, E2>;
+};
+
+export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
+export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
 
 export function Results<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<[T1, T2], E1 | E2>
 export function Results<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<[T1, T2, T3], E1 | E2 | E3>
@@ -122,8 +97,8 @@ export function Results(...results: Result<any, any>[]): Result<any[], any> {
         if (result.ok) {
             okResult.push(result.val);
         } else {
-            return Err(result.val);
+            return new Err(result.val);
         }
     }
-    return Ok(okResult);
+    return new Ok(okResult);
 }

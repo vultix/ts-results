@@ -1,48 +1,40 @@
 import { Observable, ObservableInput, of, OperatorFunction } from 'rxjs';
-import { map, mergeMap, switchMap } from 'rxjs/operators';
-import { Err, Ok, Result, ResultImpl } from './index';
+import { filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { Err, Ok, Result, ResultErrType, ResultOkType } from './index';
 
-export function resultMap<R extends Result<any, any>, T>(mapper: (val: R['_t']) => T): OperatorFunction<R, Result<T, R['_e']>>
-export function resultMap<R extends Result<any, any>, T2>(mapper: null | undefined, errMapper: (val: R['_e']) => T2): OperatorFunction<R, Result<R['_t'], T2>>
-export function resultMap<R extends Result<any, any>, T, T2>(mapper: (val: R['_t']) => T, errMapper: (val: R['_e']) => T2): OperatorFunction<R, Result<T, T2>>
-export function resultMap<R extends Result<any, any>, T, T2>(mapper: null | undefined | ((val: R['_t']) => T), errMapper?: (val: R['_e']) => T2): OperatorFunction<R, Result<T, T2>> {
+export function resultMap<R extends Result<any, any>, T>(mapper: (val: ResultOkType<R>) => T): OperatorFunction<R, Result<T, ResultErrType<R>>> {
     return (source: Observable<R>) => {
         return source.pipe(
-          map(result => {
-              if (result.ok) {
-                  if (mapper) {
-                      const newVal = mapper(result.val);
-                      return Ok(newVal);
-                  } else {
-                      return result;
-                  }
-              } else {
-                  if (errMapper) {
-                      return Err(errMapper(result.val));
-                  } else {
-                      return result;
-                  }
-              }
-          })
+          map(result => result.map(mapper))
         );
     };
 }
 
-export function resultMapTo<R extends Result<any, any>, T>(value: T): OperatorFunction<R, Result<T, R['_e']>> {
+export function resultMapErr<R extends Result<any, any>, E>(mapper: (val: ResultErrType<R>) => E): OperatorFunction<R, Result<ResultOkType<R>, E>> {
     return (source: Observable<R>) => {
         return source.pipe(
-          map(result => {
-              if (result.ok) {
-                  return Ok(value);
-              } else {
-                  return result;
-              }
-          })
+          map(result => result.mapErr(mapper))
         );
     };
 }
 
-export function elseMap<R extends Result<any, any>, T>(mapper: (val: R['_e']) => T): OperatorFunction<R, R['_t'] | T> {
+export function resultMapTo<R extends Result<any, any>, T>(value: T): OperatorFunction<R, Result<T, ResultErrType<R>>> {
+    return (source: Observable<R>) => {
+        return source.pipe(
+          map(result => result.map(() => value))
+        );
+    };
+}
+
+export function resultMapErrTo<R extends Result<any, any>, T>(value: T): OperatorFunction<R, Result<ResultOkType<R>, T>> {
+    return (source: Observable<R>) => {
+        return source.pipe(
+          map(result => result.mapErr(() => value))
+        );
+    };
+}
+
+export function elseMap<R extends Result<any, any>, T>(mapper: (val: ResultErrType<R>) => T): OperatorFunction<R, ResultOkType<R> | T> {
     return (source: Observable<R>) => {
         return source.pipe(
           map(result => {
@@ -56,7 +48,7 @@ export function elseMap<R extends Result<any, any>, T>(mapper: (val: R['_e']) =>
     };
 }
 
-export function elseMapTo<R extends Result<any, any>, T>(value: T): OperatorFunction<R, R['_t'] | T> {
+export function elseMapTo<R extends Result<any, any>, T>(value: T): OperatorFunction<R, ResultOkType<R> | T> {
     return (source: Observable<R>) => {
         return source.pipe(
           map(result => {
@@ -70,9 +62,9 @@ export function elseMapTo<R extends Result<any, any>, T>(value: T): OperatorFunc
     };
 }
 
-export function resultSwitchMap<R extends Result<any, any>, T extends Result<any, any>>(mapper: (val: R['_t']) => ObservableInput<T>): OperatorFunction<R, Result<T['_t'], R['_e'] | T['_e']>>
-export function resultSwitchMap<R extends Result<any, any>, T>(mapper: (val: R['_t']) => ObservableInput<T>): OperatorFunction<R, Result<T, R['_e']>>
-export function resultSwitchMap<R extends Result<any, any>>(mapper: (val: R['_t']) => ObservableInput<any>): OperatorFunction<R, Result<any, any>> {
+export function resultSwitchMap<R extends Result<any, any>, T extends Result<any, any>>(mapper: (val: ResultOkType<R>) => ObservableInput<T>): OperatorFunction<R, Result<ResultOkType<T>, ResultErrType<R> | ResultErrType<T>>>
+export function resultSwitchMap<R extends Result<any, any>, T>(mapper: (val: ResultOkType<R>) => ObservableInput<T>): OperatorFunction<R, Result<T, ResultErrType<R>>>
+export function resultSwitchMap<R extends Result<any, any>>(mapper: (val: ResultOkType<R>) => ObservableInput<any>): OperatorFunction<R, Result<any, any>> {
     return (source: Observable<R>) => {
         return source.pipe(
           switchMap(result => {
@@ -83,19 +75,19 @@ export function resultSwitchMap<R extends Result<any, any>>(mapper: (val: R['_t'
               }
           }),
           map(result => {
-              if (result instanceof ResultImpl) {
-                  return result as Result<any, any>;
+              if (result instanceof Ok || result instanceof Err) {
+                  return result;
               } else {
-                  return Ok(result);
+                  return new Ok(result);
               }
           })
         );
     };
 }
 
-export function resultMergeMap<R extends Result<any, any>, T extends Result<any, any>>(mapper: (val: R['_t']) => ObservableInput<T>): OperatorFunction<R, Result<T['_t'], R['_e'] | T['_e']>>
-export function resultMergeMap<R extends Result<any, any>, T>(mapper: (val: R['_t']) => ObservableInput<T>): OperatorFunction<R, Result<T, R['_e']>>
-export function resultMergeMap<R extends Result<any, any>>(mapper: (val: R['_t']) => ObservableInput<any>): OperatorFunction<R, Result<any, any>> {
+export function resultMergeMap<R extends Result<any, any>, T extends Result<any, any>>(mapper: (val: ResultOkType<R>) => ObservableInput<T>): OperatorFunction<R, Result<ResultOkType<T>, ResultErrType<R> | ResultErrType<T>>>
+export function resultMergeMap<R extends Result<any, any>, T>(mapper: (val: ResultOkType<R>) => ObservableInput<T>): OperatorFunction<R, Result<T, ResultErrType<R>>>
+export function resultMergeMap<R extends Result<any, any>>(mapper: (val: ResultOkType<R>) => ObservableInput<any>): OperatorFunction<R, Result<any, any>> {
     return (source: Observable<R>) => {
         return source.pipe(
           mergeMap(result => {
@@ -106,12 +98,30 @@ export function resultMergeMap<R extends Result<any, any>>(mapper: (val: R['_t']
               }
           }),
           map(result => {
-              if (result instanceof ResultImpl) {
-                  return result as Result<any, any>;
+              if (result instanceof Ok || result instanceof Err) {
+                  return result;
               } else {
-                  return Ok(result);
+                  return new Ok(result);
               }
           })
         );
     };
+}
+
+export function filterResultOk<R extends Result<any,any>>(): OperatorFunction<R, ResultOkType<R>> {
+    return (source: Observable<R>) => {
+        return source.pipe(
+          filter(result => result.ok),
+          map(result => result.val)
+        )
+    }
+}
+
+export function filterResultErr<R extends Result<any,any>>(): OperatorFunction<R, ResultErrType<R>> {
+    return (source: Observable<R>) => {
+        return source.pipe(
+          filter(result => result.err),
+          map(result => result.val)
+        )
+    }
 }

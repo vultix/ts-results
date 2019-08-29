@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="HotSwapAgentPluginSettingsProvider">
+    <option name="agentPath" value="$APPLICATION_PLUGINS_DIR$/hotswap-agent-intellij-plugin/lib/agent/hotswap-agent-1.3.0.jar" />
+  </component>
+</project>

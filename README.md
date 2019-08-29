@@ -1,23 +1,29 @@
 # ts-results
-A typescript implementation of [Rust's Result](https://doc.rust-lang.org/std/result/) object.
+A typescript implementation of [Rust's Result](https://doc.rust-lang.org/std/result/) object.  Brings compile-time error checking to typescript.
 
+*Note: This is the documentation for the newly released `ts-results@2.0.0` with breaking changes.  To see breaking changes, go to [CHANGELOG.md](https://github.com/vultix/ts-results/blob/master/CHANGELOG.md)*
 ## Contents
 
 * [Installation](#installation)
+* [Example](#example)
 * [Usage](#usage)
     * [Creation](#creation)
     * [Type Safety](#type-safety)
     * [Unwrap](#unwrap)
     * [Expect](#expect) 	
-    * [Map](#map)
+    * [Map, MapErr](#map-and-maperr)
     * [Else](#else)
     * [Combining Results](#combining-results)
 * [Usage with rxjs](#usage-with-rxjs)
     * [resultMap](#resultmap)
+    * [resultMapErr](#resultmaperr)
     * [resultMapTo](#resultmapto)
+    * [resultMapErrTo](#resultmapto)
     * [elseMap](#elsemap)
     * [elseMapTo](#elsemapto)
     * [resultSwitchMap, resultMergeMap](#resultswitchmap-and-resultmergemap)
+    * [filterResultOk](#filterresultok)
+    * [filterResultErr](#filterresulterr)
 
 ## Installation
 ```bash
@@ -28,16 +34,58 @@ or
 $ yarn install ts-results
 ```
 
+## Example
+Convert this:
+```typescript
+import {existsSync, readFileSync} from 'fs';
+
+function readFile(path: string): string {
+    if (existsSync) {
+        return readFileSync(path);
+    } else {
+        // Callers of readFile have no way of knowing the function can fail
+        throw new Error('invalid path');
+    }
+}
+// This line may fail unexpectedly without warnings from typescript
+const text = readFile('test.txt');
+```
+
+To this:
+```typescript
+import {existsSync, readFileSync} from 'fs';
+import {Ok, Err, Result} from 'ts-results';
+
+function readFile(path: string): Result<string, 'invalid path'> {
+    if (existsSync) {
+        return new Ok(readFileSync(path));
+    } else {
+        // Now typescript knows we return an error type
+        return new Err("invalid path");
+    }
+}
+
+// Typescript now forces you to check whether you have a valid result at compile time.
+const result = readFile('test.txt');
+if (result.ok) {
+    // text contains the file's content
+    const text = result.val;
+} else {
+    // err equals 'invalid path'
+    const err = result.val;
+}
+```
+
 ## Usage
 ```typescript
 import { Result, Err, Ok, Results } from 'ts-results';
 ```
 #### Creation
 ```typescript
-let okResult: Result<number, Error> = Ok(10);
+let okResult: Result<number, Error> = new Ok(10);
 let okResult2 = Ok<number, Error>(10); // Exact same as above
 
-let errorResult: Result<number, Error> = Ok(new Error('bad number!'));
+let errorResult: Result<number, Error> = new Ok(new Error('bad number!'));
 let errorResult2 = Ok<number, Error>(new Error('bad number!')); // Exact same as above
 
 ```
@@ -64,8 +112,8 @@ if (result.err) {
 
 #### Unwrap
 ```typescript
-let goodResult = Ok<number, Error>(1);
-let badResult = Err<number, Error>(new Error("something went wrong"));
+let goodResult = new Ok(1);
+let badResult = new Err(new Error("something went wrong"));
 
 goodResult.unwrap(); // 1
 badResult.unwrap(); // throws Error("something went wrong")
@@ -80,25 +128,22 @@ goodResult.expect('goodResult should be a number'); // 1
 badResult.expect('badResult should be a number'); // throws Error("badResult should be a number - Error: something went wrong")
 ```
 
-#### Map
+#### Map and MapErr
 ```typescript
-let goodResult = Ok<number, Error>(1);
-let badResult = Err<number, Error>(new Error("something went wrong"));
+let goodResult = new Ok(1);
+let badResult = new Err(new Error("something went wrong"));
 
 goodResult.map(num => num + 1).unwrap(); // 2
 badResult.map(num => num + 1).unwrap(); // throws Error("something went wrong")
 
-goodResult.map(num => num + 1, err => new Error('mapped')).unwrap(); // 2
-badResult.map(num => num + 1, err => new Error('mapped')).unwrap(); // throws Error("mapped")
-
-goodResult.map(null, err => new Error('mapped')).unwrap(); // 1
-badResult.map(null, err => new Error('mapped')).unwrap(); // throws Error("mapped")
+goodResult.map(num => num + 1).mapErr(err => new Error('mapped')).unwrap(); // 2
+badResult.map(num => num + 1).mapErr(err => new Error('mapped')).unwrap(); // throws Error("mapped")
 ```
 
 #### Else
 ```typescript
-let goodResult = Ok<number, Error>(1);
-let badResult = Err<number, Error>(new Error("something went wrong"));
+let goodResult = new Ok(1);
+let badResult = new Err(new Error("something went wrong"));
 
 goodResult.else(5); // 1
 badResult.else(5); // 5
@@ -126,16 +171,15 @@ import {of, Observable} from 'rxjs';
 import {Ok, Err, Result} from 'ts-results';
 import {resultMap} from 'ts-results/rxjs-operators';
 
-const obs$: Observable<Result<number, Error>> = of(Ok(5), Err(new Error('uh oh')));
+const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err('uh oh'));
 
-const doubled = obs$.pipe(
-  resultMap(number => number * 2), // Doubles the value
-  resultMap(null, err => err.message), // You can also map the error
-); // Has type Observable<Result<number, string>>
+const greaterThanZero = obs$.pipe(
+  resultMap(number => number > 0), // Doubles the value
+); // Has type Observable<Result<boolean, 'uh oh'>>
 
-doubled.subscribe(result => {
+greaterThanZero.subscribe(result => {
   if (result.ok) {
-    console.log('Got number: ' + result.val);
+    console.log('Was greater than zero: ' + result.val);
   } else {
     console.log('Got Error Message: ' + result.val);
   }
@@ -145,11 +189,24 @@ doubled.subscribe(result => {
 // Got number: 10
 // Got Error Message: uh oh
 ```
+#### resultMapErr
+```typescript
+import {resultMapErr} from 'ts-results/rxjs-operators';
+```
+
+Behaves exactly the same as [resultMap](#resultmap), but maps the error value.
+
 #### resultMapTo
 ```typescript
 import {resultMapTo} from 'ts-results/rxjs-operators';
 ```
 Behaves the same as [resultMap](#resultmap), but takes a value instead of a function.
+
+#### resultMapErrTo
+```typescript
+import {resultMapErrTo} from 'ts-results/rxjs-operators';
+```
+Behaves the same as [resultMapErr](#resultmaperr), but takes a value instead of a function.
 
 #### elseMap
 Allows you to turn a stream of Result objects into a stream of values, transforming any errors into a value.
@@ -160,7 +217,7 @@ import {of, Observable} from 'rxjs';
 import {Ok, Err, Result} from 'ts-results';
 import {elseMap} from 'ts-results/rxjs-operators';
 
-const obs$: Observable<Result<number, Error>> = of(Ok(5), Err(new Error('uh oh')));
+const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
 const doubled = obs$.pipe(
   elseMap(err => {
@@ -197,9 +254,9 @@ import {of, Observable} from 'rxjs';
 import {Ok, Err, Result} from 'ts-results';
 import {resultMergeMap} from 'ts-results/rxjs-operators';
 
-const obs$: Observable<Result<number, Error>> = of(Ok(5), Err(new Error('uh oh')));
+const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
-const obs2$: Observable<Result<string, CustomError>> = of(Ok('hi'), Err(new CustomError('custom error')));
+const obs2$: Observable<Result<string, CustomError>> = of(new Ok('hi'), new Err(new CustomError('custom error')));
 
 const test$ = obs$.pipe(
   resultMergeMap(number => {
@@ -222,4 +279,51 @@ test$.subscribe(result => {
 // Got string: hi
 // Got error: custom error
 // Got error: uh oh
+```
+
+
+#### filterResultOk
+Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the Errs and mapping to the Ok values.
+
+```typescript
+import {of, Observable} from 'rxjs';
+import {Ok, Err, Result} from 'ts-results';
+import {filterResultOk} from 'ts-results/rxjs-operators';
+
+const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
+
+const test$ = obs$.pipe(
+  filterResultOk()
+); // Has type Observable<number>
+
+test$.subscribe(result => {
+  console.log('Got number: ' + result);
+});
+
+// Logs the following:
+// Got number: 5
+
+```
+
+#### filterResultErr
+Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the Oks and mapping to the error values.
+
+```typescript
+import {of, Observable} from 'rxjs';
+import {Ok, Err, Result} from 'ts-results';
+import {filterResultOk} from 'ts-results/rxjs-operators';
+
+const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
+
+const test$ = obs$.pipe(
+  filterResultOk()
+); // Has type Observable<number>
+
+test$.subscribe(result => {
+  console.log('Got number: ' + result);
+});
+
+// Logs the following:
+// Got number: 5
+
 ```

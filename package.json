@@ -1,6 +1,6 @@
 {
   "name": "ts-results",
-  "version": "1.1.1",
+  "version": "2.0.0-alpha.1",
   "description": "",
   "scripts": {
     "build": "npm run clean && tsc && copyfiles README.md LICENSE src/package.json dist --flat",
