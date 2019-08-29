@@ -40,7 +40,7 @@ Convert this:
 import {existsSync, readFileSync} from 'fs';
 
 function readFile(path: string): string {
-    if (existsSync) {
+    if (existsSync(path)) {
         return readFileSync(path);
     } else {
         // Callers of readFile have no way of knowing the function can fail
@@ -57,10 +57,9 @@ import {existsSync, readFileSync} from 'fs';
 import {Ok, Err, Result} from 'ts-results';
 
 function readFile(path: string): Result<string, 'invalid path'> {
-    if (existsSync) {
+    if (existsSync(path)) {
         return new Ok(readFileSync(path));
     } else {
-        // Now typescript knows we return an error type
         return new Err("invalid path");
     }
 }
