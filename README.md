@@ -13,6 +13,7 @@ A typescript implementation of [Rust's Result](https://doc.rust-lang.org/std/res
     * [Expect](#expect) 	
     * [Map, MapErr](#map-and-maperr)
     * [Else](#else)
+    * [Empty](#empty)
     * [Combining Results](#combining-results)
 * [Usage with rxjs](#usage-with-rxjs)
     * [resultMap](#resultmap)
@@ -146,6 +147,17 @@ let badResult = new Err(new Error("something went wrong"));
 
 goodResult.else(5); // 1
 badResult.else(5); // 5
+```
+
+#### Empty
+```typescript
+function checkIsValid(isValid: boolean): Result<void, Error> {
+    if (isValid) {
+        return Ok.EMPTY;
+    } else {
+        return new Err(new Error("Not valid"))
+    }
+}
 ```
 
 #### Combining Results

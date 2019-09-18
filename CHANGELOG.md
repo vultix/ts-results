@@ -1,3 +1,7 @@
+# v2.0.1
+### New Features
+* **core:** Added `reaonly static EMPTY: Ok<void>;` to `Ok` class. 
+* **core:** Added `reaonly static EMPTY: Err<void>;` to `Err` class.
 
 # v2.0.0 
 This release features a complete rewrite of most of the library with one focus in mind: simpler types.  

@@ -1,4 +1,6 @@
 export class Err<E> {
+    static readonly EMPTY = new Err<void>(undefined);
+
     readonly ok = false;
     readonly err = true;
 
@@ -47,6 +49,8 @@ export class Err<E> {
 }
 
 export class Ok<T> {
+    static readonly EMPTY = new Ok<void>(undefined);
+
     readonly ok = true;
     readonly err = false;
 
