@@ -32,7 +32,7 @@ $ npm install ts-results
 ```
 or
 ```bash
-$ yarn install ts-results
+$ yarn add ts-results
 ```
 
 ## Example
