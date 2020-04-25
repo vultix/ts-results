@@ -5,14 +5,14 @@
     "sourceMap": true,
     "declaration": true,
     "moduleResolution": "node",
-    "module": "es2015",
+    "module": "commonjs",
     "noEmitHelpers": false,
     "skipLibCheck": true,
     "lib": ["es2015"],
     "strict": true,
     "noImplicitReturns": true,
     "baseUrl": "./",
-    "target": "es6",
+    "target": "es5",
     "forceConsistentCasingInFileNames": true
   },
   "include": [

@@ -6,12 +6,14 @@
     "build": "npm run clean && tsc && copyfiles README.md LICENSE src/package.json dist --flat",
     "clean": "rm -rf dist"
   },
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "copyfiles": "^2.1.0",
     "rxjs": "^6.1.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.8.3"
   }
 }

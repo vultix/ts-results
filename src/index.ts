@@ -16,7 +16,7 @@ export class Err<E> {
     }
 
     expect(msg: string): never {
-        let value = this.val.toString();
+        let value = String(this.val);
         if (value === '[object Object]') {
             try {
                 value = JSON.stringify(value);
@@ -28,7 +28,7 @@ export class Err<E> {
     }
 
     unwrap(): never {
-        let value = this.val.toString();
+        let value = String(this.val);
         if (value === '[object Object]') {
             try {
                 value = JSON.stringify(value);
