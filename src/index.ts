@@ -1,18 +1,25 @@
 function toString(val: unknown) {
-    let value = ''.toString.call(val);
-    if (value === '[object Object]') {
+    let value = "".toString.call(val);
+    if (value === "[object Object]") {
         try {
             value = JSON.stringify(value);
         } catch {}
     }
-    return value
+    return value;
 }
 function callable(constructor: any) {
     return new Proxy(constructor, {
         apply(target: any, thisArg: any, argArray?: any) {
-            return new target(...argArray)
-        }
-    })
+            return new target(...argArray);
+        },
+    });
+}
+function wrap<T>(x: () => T) {
+    try {
+        return new Ok(x());
+    } catch (e) {
+        return new Err<unknown>(e);
+    }
 }
 // @ts-expect-error Duplicate identifier 'Err'.ts(2300)
 export declare function Err<E>(val: E): Err<E>;
@@ -20,12 +27,17 @@ export declare function Err<E>(val: E): Err<E>;
 // @ts-expect-error Duplicate identifier 'Err'.ts(2300)
 export class Err<E> {
     static readonly EMPTY = new Err<void>(undefined);
+    static wrap = wrap;
 
     readonly ok = false;
     readonly err = true;
 
     [Symbol.iterator](): Iterator<never, never, any> {
-        return { next(): IteratorResult<never, never> { return { done: true, value: undefined! } } }
+        return {
+            next(): IteratorResult<never, never> {
+                return { done: true, value: undefined! };
+            },
+        };
     }
     constructor(public readonly val: E) {}
 
@@ -64,16 +76,16 @@ export declare function Ok<T>(val: T): Ok<T>;
 // @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
 export class Ok<T> {
     static readonly EMPTY = new Ok<void>(undefined);
+    static wrap = wrap;
 
     readonly ok = true;
     readonly err = false;
 
     [Symbol.iterator](): T extends Iterable<infer U> ? Iterator<U> : never {
         // @ts-ignore
-        return this.val[Symbol.iterator]()
+        return this.val[Symbol.iterator]();
     }
-    constructor(public readonly val: T) {
-    }
+    constructor(public readonly val: T) {}
 
     /**
      * If the result has a value returns that value.  Otherwise returns the passed in value.
@@ -112,13 +124,12 @@ export type Result<T, E> = (Ok<T> | Err<E>) & {
 
 export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
 export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
-
-export function Results(): Result<[], never>
-export function Results<T1, E1>(result1: Result<T1, E1>): Result<[T1], E1>
-export function Results<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<[T1, T2], E1 | E2>
-export function Results<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<[T1, T2, T3], E1 | E2 | E3>
-export function Results<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<[T1, T2, T3, T4], E1 | E2 | E3 | E4>
-export function Results(...results: Result<any, any>[]): Result<any[], any>
+export function Results(): Result<[], never>;
+export function Results<T1, E1>(result1: Result<T1, E1>): Result<[T1], E1>;
+export function Results<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<[T1, T2], E1 | E2>;
+export function Results<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<[T1, T2, T3], E1 | E2 | E3>;
+export function Results<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<[T1, T2, T3, T4], E1 | E2 | E3 | E4>;
+export function Results(...results: Result<any, any>[]): Result<any[], any>;
 export function Results(...results: Result<any, any>[]): Result<any[], any> {
     const okResult = [];
     for (let result of results) {
