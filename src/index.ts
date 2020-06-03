@@ -137,22 +137,42 @@ export type Result<T, E> = (Ok<T> | Err<E>) & Base<T, E>;
 
 export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
 export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
+// Suggest to rename to all
+/**
+ * Parse a set of `Result`s, short-circuits when an input value is `Err`.
+ */
 export function Results(): Result<[], never>;
 export function Results<T1, E1>(result1: Result<T1, E1>): Result<[T1], E1>;
 export function Results<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<[T1, T2], E1 | E2>;
 export function Results<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<[T1, T2, T3], E1 | E2 | E3>;
 export function Results<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<[T1, T2, T3, T4], E1 | E2 | E3 | E4>;
-export function Results(...results: Result<any, any>[]): Result<any[], any>;
+export function Results<T, E>(...results: Result<T, E>[]): Result<T[], E>;
 export function Results(...results: Result<any, any>[]): Result<any[], any> {
     const okResult = [];
     for (let result of results) {
         if (result.ok) {
             okResult.push(result.val);
         } else {
-            return new Err(result.val);
+            return result.val;
         }
     }
     return new Ok(okResult);
+}
+/**
+ * Parse a set of `Result`s, short-circuits when an input value is `Ok`.
+ */
+export function any(): Result<void, never>;
+export function any<T1, E1>(result1: Result<T1, E1>): Result<T1, E1>;
+export function any<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<T1 | T2, E1 | E2>;
+export function any<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<T1 | T2 | T3, E1 | E2 | E3>;
+export function any<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<T1 | T2 | T3 | T4, E1 | E2 | E3 | E4>;
+export function any<T, E>(...results: Result<T, E>[]): Result<T, E>;
+export function any(...results: Result<any, any>[]): Result<any, any> {
+    // short-circuits
+    for (const result of results) if (result.ok) return result;
+    if (results.length === 0) return Ok.EMPTY;
+    // it must be a Err
+    return results[results.length - 1];
 }
 function toString(val: unknown) {
     let value = "".toString.call(val);

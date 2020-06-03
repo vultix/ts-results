@@ -7,6 +7,7 @@ import {
     ResultErrType,
     Results,
     wrap,
+    any,
 } from "../dist/index";
 
 declare function work(): Result<string, number>;
@@ -169,6 +170,23 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
     eq<typeof r2, Result<[string, string], number>>(true);
     const r3 = Results(ok(), err(), work());
     eq<typeof r3, Result<[string, never, string], number>>(true);
+    const r4 = Results(...([] as Result<string, number>[]));
+    eq<typeof r4, Result<string[], number>>(true);
+}
+//#endregion
+//#region any(...args)
+{
+    type T = Result<string, number>;
+    const r0 = any();
+    eq<typeof r0, Result<void, never>>(true);
+    const r1 = any(work());
+    eq<typeof r1, T>(true);
+    const r2 = any(work(), work());
+    eq<typeof r2, T>(true);
+    const r3 = any(ok(), err(), work());
+    eq<typeof r3, T>(true);
+    const r4 = any(...([] as Result<string, number>[]));
+    eq<typeof r4, T>(true);
 }
 //#endregion
 //#region Iterable<T>
