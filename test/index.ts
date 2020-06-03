@@ -16,13 +16,13 @@ declare function err(): Err<number>;
   const r = new Err(0);
   assert<typeof r.err>(true);
   assert<typeof r.ok>(false);
-  assert<IsExact<typeof r.val, number>>(true);
+  eq<typeof r.val, number>(true);
 }
 {
   const r = new Ok(0);
   assert<typeof r.err>(false);
   assert<typeof r.ok>(true);
-  assert<IsExact<typeof r.val, number>>(true);
+  eq<typeof r.val, number>(true);
 }
 //#endregion
 //#region Ok<T> & Err<E> should be Result<T, E>
@@ -30,26 +30,26 @@ declare function err(): Err<number>;
   const r1 = new Err(0);
   const r2 = new Ok("");
   const r = Math.random() ? r1 : r2;
-  assert<IsExact<typeof r, Result<string, number>>>(true);
+  eq<typeof r, Result<string, number>>(true);
 }
 //#endregion
 //#region static EMPTY
-assert<IsExact<typeof Err.EMPTY, Err<void>>>(true);
-assert<IsExact<typeof Ok.EMPTY, Ok<void>>>(true);
+eq<typeof Err.EMPTY, Err<void>>(true);
+eq<typeof Ok.EMPTY, Ok<void>>(true);
 //#endregion
 //#region Type narrowing test (tagged union)
 {
   const r = work();
   if (r.ok) {
-    assert<IsExact<typeof r, Ok<string>>>(true);
+    eq<typeof r, Ok<string>>(true);
   } else {
-    assert<IsExact<typeof r, Err<number>>>(true);
+    eq<typeof r, Err<number>>(true);
   }
   // ---------------------------------------------
   if (r.err) {
-    assert<IsExact<typeof r, Err<number>>>(true);
+    eq<typeof r, Err<number>>(true);
   } else {
-    assert<IsExact<typeof r, Ok<string>>>(true);
+    eq<typeof r, Ok<string>>(true);
   }
 }
 //#endregion
@@ -57,15 +57,15 @@ assert<IsExact<typeof Ok.EMPTY, Ok<void>>>(true);
 {
   const r = work();
   if (r instanceof Ok) {
-    assert<IsExact<typeof r, Ok<string>>>(true);
+    eq<typeof r, Ok<string>>(true);
   } else {
-    assert<IsExact<typeof r, Err<number>>>(true);
+    eq<typeof r, Err<number>>(true);
   }
   // ---------------------------------------------
   if (r instanceof Err) {
-    assert<IsExact<typeof r, Err<number>>>(true);
+    eq<typeof r, Err<number>>(true);
   } else {
-    assert<IsExact<typeof r, Ok<string>>>(true);
+    eq<typeof r, Ok<string>>(true);
   }
 }
 //#endregion
@@ -75,13 +75,13 @@ assert<IsExact<typeof Ok.EMPTY, Ok<void>>>(true);
   expect_string(r1);
 
   const r2 = err().else(false);
-  assert<IsExact<false, typeof r2>>(true);
+  eq<false, typeof r2>(true);
 
   // FIXME: GH#4 TS2349: This expression (Result<?, ?>.else) is not callable
   // @ts-expect-error
   const r3 = work().else(false);
   // @ts-expect-error
-  assert<IsExact<typeof r3, string | false>>(true);
+  eq<typeof r3, string | false>(true);
 }
 //#endregion
 //#region expect(msg)
@@ -107,54 +107,55 @@ assert<IsExact<typeof Ok.EMPTY, Ok<void>>>(true);
 //#region map(mapper)
 {
   const r1 = ok().map(Symbol);
-  assert<IsExact<typeof r1, Ok<symbol>>>(true);
+  eq<typeof r1, Ok<symbol>>(true);
   const r2 = err().map((x) => Symbol());
-  assert<IsExact<typeof r2, Err<number>>>(true);
+  eq<typeof r2, Err<number>>(true);
   const r3 = work().map(Symbol);
-  assert<IsExact<typeof r3, Result<symbol, number>>>(true);
+  eq<typeof r3, Result<symbol, number>>(true);
 }
 //#endregion
 //#region mapErr(mapper)
 {
   const r1 = ok().mapErr(Symbol);
-  assert<IsExact<typeof r1, Ok<string>>>(true);
+  eq<typeof r1, Ok<string>>(true);
   const r2 = err().mapErr((x) => Symbol());
-  assert<IsExact<typeof r2, Err<symbol>>>(true);
+  eq<typeof r2, Err<symbol>>(true);
   const r3 = work().mapErr(Symbol);
-  assert<IsExact<typeof r3, Result<string, symbol>>>(true);
+  eq<typeof r3, Result<string, symbol>>(true);
 }
 //#endregion
 //#region ResultOkType & ResultErrType
 {
   type a = ResultOkType<Ok<string>>;
-  assert<IsExact<string, a>>(true);
+  eq<string, a>(true);
   type b = ResultOkType<Err<string>>;
-  assert<IsExact<never, b>>(true);
+  eq<never, b>(true);
   type c = ResultOkType<Result<string, number>>;
-  assert<IsExact<string, c>>(true);
+  eq<string, c>(true);
 }
 {
   type a = ResultErrType<Ok<string>>;
-  assert<IsExact<never, a>>(true);
+  eq<never, a>(true);
   type b = ResultErrType<Err<string>>;
-  assert<IsExact<string, b>>(true);
+  eq<string, b>(true);
   type c = ResultErrType<Result<string, number>>;
-  assert<IsExact<number, c>>(true);
+  eq<number, c>(true);
 }
 //#endregion
 //#region !!! NOT PASSING: Results(...args)
 {
   const r0 = Results();
   // @ts-expect-error, actually Result<any[], any>
-  assert<IsExact<typeof r0, Result<[], void>>>(true);
+  eq<typeof r0, Result<[], void>>(true);
   const r1 = Results(work());
   // @ts-expect-error, actually Result<any[], any>
-  assert<IsExact<typeof r1, Result<[string], number>>>(true);
+  eq<typeof r1, Result<[string], number>>(true);
   const r2 = Results(work(), work());
-  assert<IsExact<typeof r2, Result<[string, string], number>>>(true);
+  eq<typeof r2, Result<[string, string], number>>(true);
   const r3 = Results(ok(), err(), work());
-  assert<IsExact<typeof r3, Result<[string, never, string], number>>>(true);
+  eq<typeof r3, Result<[string, never, string], number>>(true);
 }
 //#endregion
 function expect_string(x: string) {}
 function expect_never(x: never) {}
+function eq<A, B>(x: IsExact<A, B>) {}
