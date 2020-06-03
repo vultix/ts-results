@@ -1,4 +1,4 @@
-import { assert, IsExact } from "conditional-type-checks";
+import { assert, IsExact, IsNever } from "conditional-type-checks";
 import {
   Err,
   Ok,
@@ -81,7 +81,7 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
 //#region else(val)
 {
   const r1 = ok().else(false);
-  expect_string(r1);
+  expect_string(r1, true);
 
   const r2 = err().else(false);
   eq<false, typeof r2>(true);
@@ -93,21 +93,21 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
 //#region expect(msg)
 {
   const r1 = ok().expect("");
-  expect_string(r1);
+  expect_string(r1, true);
   const r2 = err().expect("");
-  expect_never(r2);
+  expect_never(r2, true);
   const r3 = work().expect("");
-  expect_string(r3);
+  expect_string(r3, true);
 }
 //#endregion
 //#region unwrap()
 {
   const r1 = ok().unwrap();
-  expect_string(r1);
+  expect_string(r1, true);
   const r2 = err().unwrap();
-  expect_never(r2);
+  expect_never(r2, true);
   const r3 = work().unwrap();
-  expect_string(r3);
+  expect_string(r3, true);
 }
 //#endregion
 //#region map(mapper)
@@ -170,6 +170,33 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   eq<typeof r3, Result<[string, never, string], number>>(true);
 }
 //#endregion
-function expect_string(x: string) {}
-function expect_never(x: never) {}
+//#region Iterable<T>
+{
+  const x = work()[Symbol.iterator];
+  assert<
+    IsExact<
+      typeof x,
+      | (() => Iterator<string, any, undefined>)
+      | (() => Iterator<never, any, undefined>)
+    >
+  >(true);
+  for (const char of work()) {
+    expect_string(char, true);
+  }
+  for (const item of Ok([1, 2, 3])) {
+    assert<IsExact<number, typeof item>>(true);
+  }
+  for (const item of Err(0)) {
+    expect_never(item, true);
+    throw new Error(
+      "Unreachable, Err@@iterator should emit no value and return"
+    );
+  }
+  // @ts-expect-error An iterator must have a 'next()' method.ts(2489)
+  for (const expectError of Ok(1)) {
+  }
+}
+//#endregion
+function expect_string<T>(x: T, y: IsExact<T, string>) {}
+function expect_never<T>(x: T, y: IsNever<T>) {}
 function eq<A, B>(x: IsExact<A, B>) {}

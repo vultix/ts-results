@@ -24,6 +24,9 @@ export class Err<E> {
     readonly ok = false;
     readonly err = true;
 
+    [Symbol.iterator](): Iterator<never, never, any> {
+        return { next(): IteratorResult<never, never> { return { done: true, value: undefined! } } }
+    }
     constructor(public readonly val: E) {}
 
     /**
@@ -65,7 +68,12 @@ export class Ok<T> {
     readonly ok = true;
     readonly err = false;
 
-    constructor(public readonly val: T) {}
+    [Symbol.iterator](): T extends Iterable<infer U> ? Iterator<U> : never {
+        // @ts-ignore
+        return this.val[Symbol.iterator]()
+    }
+    constructor(public readonly val: T) {
+    }
 
     /**
      * If the result has a value returns that value.  Otherwise returns the passed in value.

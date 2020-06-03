@@ -11,6 +11,7 @@ export function resultMap<R extends Result<any, any>, T>(mapper: (val: ResultOkT
 }
 
 export function resultMapErr<R extends Result<any, any>, E>(mapper: (val: ResultErrType<R>) => E): OperatorFunction<R, Result<ResultOkType<R>, E>> {
+    // @ts-ignore Help wanted
     return (source: Observable<R>) => {
         return source.pipe(
           map(result => result.mapErr(mapper))
@@ -27,6 +28,7 @@ export function resultMapTo<R extends Result<any, any>, T>(value: T): OperatorFu
 }
 
 export function resultMapErrTo<R extends Result<any, any>, T>(value: T): OperatorFunction<R, Result<ResultOkType<R>, T>> {
+    // @ts-ignore Help wanted
     return (source: Observable<R>) => {
         return source.pipe(
           map(result => result.mapErr(() => value))
