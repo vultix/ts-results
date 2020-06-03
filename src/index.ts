@@ -105,6 +105,8 @@ export type Result<T, E> = (Ok<T> | Err<E>) & {
 export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
 export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
 
+export function Results(): Result<[], never>
+export function Results<T1, E1>(result1: Result<T1, E1>): Result<[T1], E1>
 export function Results<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<[T1, T2], E1 | E2>
 export function Results<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<[T1, T2, T3], E1 | E2 | E3>
 export function Results<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<[T1, T2, T3, T4], E1 | E2 | E3 | E4>

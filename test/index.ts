@@ -158,13 +158,11 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   eq<number, c>(true);
 }
 //#endregion
-//#region !!! NOT PASSING: Results(...args)
+//#region Results(...args)
 {
   const r0 = Results();
-  // @ts-expect-error, actually Result<any[], any>
-  eq<typeof r0, Result<[], void>>(true);
+  eq<typeof r0, Result<[], never>>(true);
   const r1 = Results(work());
-  // @ts-expect-error, actually Result<any[], any>
   eq<typeof r1, Result<[string], number>>(true);
   const r2 = Results(work(), work());
   eq<typeof r2, Result<[string, string], number>>(true);
@@ -172,6 +170,6 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   eq<typeof r3, Result<[string, never, string], number>>(true);
 }
 //#endregion
-function expect_string(x: string) { }
+function expect_string(x: string) {}
 function expect_never(x: never) {}
 function eq<A, B>(x: IsExact<A, B>) {}
