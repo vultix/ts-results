@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "copyfiles": "^2.1.0",
-    "rxjs": "^6.1.0",
-    "typescript": "^3.3.3"
+    "copyfiles": "^2.3.0",
+    "rxjs": "^6.5.5",
+    "typescript": "^3.9.3"
   }
 }
