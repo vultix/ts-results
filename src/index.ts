@@ -1,3 +1,12 @@
+function toString(val: unknown) {
+    let value = ''.toString.call(val);
+    if (value === '[object Object]') {
+        try {
+            value = JSON.stringify(value);
+        } catch {}
+    }
+    return value
+}
 export class Err<E> {
     static readonly EMPTY = new Err<void>(undefined);
 
@@ -16,30 +25,14 @@ export class Err<E> {
     }
 
     expect(msg: string): never {
-        let value = this.val.toString();
-        if (value === '[object Object]') {
-            try {
-                value = JSON.stringify(value);
-            } catch (e) {
-
-            }
-        }
-        throw new Error(`${msg} - Error: ${value}`);
+        throw new Error(`${msg} - Error: ${toString(this.val)}`);
     }
 
     unwrap(): never {
-        let value = this.val.toString();
-        if (value === '[object Object]') {
-            try {
-                value = JSON.stringify(value);
-            } catch (e) {
-
-            }
-        }
-        throw new Error(`Tried to unwrap Error: ${value}`);
+        throw new Error(`Tried to unwrap Error: ${toString(this.val)}`);
     }
 
-    map<T2>(mapper: (val: never) => T2): Err<E> {
+    map<T2>(_mapper: (val: never) => T2): Err<E> {
         return this;
     }
 
@@ -54,18 +47,17 @@ export class Ok<T> {
     readonly ok = true;
     readonly err = false;
 
-    constructor(public readonly val: T) {
-    }
+    constructor(public readonly val: T) {}
 
     /**
      * If the result has a value returns that value.  Otherwise returns the passed in value.
-     * @param val the value to replace the error with
+     * @param _val the value to replace the error with
      */
-    else<T2>(val: T2):  T {
+    else<T2>(_val: T2):  T {
         return this.val;
     }
 
-    expect(msg: string): T {
+    expect(_msg: string): T {
         return this.val;
     }
 
@@ -77,7 +69,7 @@ export class Ok<T> {
         return new Ok(mapper(this.val));
     }
 
-    mapErr<E2>(mapper: (err: never) => E2): Ok<T> {
+    mapErr<E2>(_mapper: (err: never) => E2): Ok<T> {
         return this;
     }
 }
