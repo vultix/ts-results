@@ -7,14 +7,24 @@ function toString(val: unknown) {
     }
     return value
 }
+function callable(constructor: any) {
+    return new Proxy(constructor, {
+        apply(target: any, thisArg: any, argArray?: any) {
+            return new target(...argArray)
+        }
+    })
+}
+// @ts-expect-error Duplicate identifier 'Err'.ts(2300)
+export declare function Err<E>(val: E): Err<E>;
+@callable
+// @ts-expect-error Duplicate identifier 'Err'.ts(2300)
 export class Err<E> {
     static readonly EMPTY = new Err<void>(undefined);
 
     readonly ok = false;
     readonly err = true;
 
-    constructor(public readonly val: E) {
-    }
+    constructor(public readonly val: E) {}
 
     /**
      * If the result has a value returns that value.  Otherwise returns the passed in value.
@@ -41,6 +51,10 @@ export class Err<E> {
     }
 }
 
+// @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
+export declare function Ok<T>(val: T): Ok<T>;
+@callable
+// @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
 export class Ok<T> {
     static readonly EMPTY = new Ok<void>(undefined);
 

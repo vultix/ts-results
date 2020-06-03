@@ -6,11 +6,19 @@ import {
   ResultOkType,
   ResultErrType,
   Results,
-} from "../src/index";
+} from "../dist/index";
 
 declare function work(): Result<string, number>;
 declare function ok(): Ok<string>;
 declare function err(): Err<number>;
+//#region Callable
+{
+  const x = Err(0);
+  eq<Err<number>, typeof x>(true);
+  const y = Ok(0);
+  eq<Ok<number>, typeof y>(true);
+}
+//#endregion
 //#region ok, err, val
 {
   const r = new Err(0);
