@@ -69,7 +69,7 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   }
 }
 //#endregion
-//#region !!! NOT PASSING: else(val)
+//#region else(val)
 {
   const r1 = ok().else(false);
   expect_string(r1);
@@ -77,10 +77,7 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   const r2 = err().else(false);
   eq<false, typeof r2>(true);
 
-  // FIXME: GH#4 TS2349: This expression (Result<?, ?>.else) is not callable
-  // @ts-expect-error
   const r3 = work().else(false);
-  // @ts-expect-error
   eq<typeof r3, string | false>(true);
 }
 //#endregion

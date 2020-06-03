@@ -53,7 +53,7 @@ export class Ok<T> {
      * If the result has a value returns that value.  Otherwise returns the passed in value.
      * @param _val the value to replace the error with
      */
-    else<T2>(_val: T2):  T {
+    else(_val: unknown): T {
         return this.val;
     }
 
