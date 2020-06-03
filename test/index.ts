@@ -9,6 +9,7 @@ import {
 } from "../dist/index";
 
 declare function work(): Result<string, number>;
+declare function work2(x: string): Result<symbol, string>;
 declare function ok(): Ok<string>;
 declare function err(): Err<number>;
 //#region Callable
@@ -119,6 +120,16 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   eq<typeof r3, Result<symbol, number>>(true);
 }
 //#endregion
+//#region flatMap
+{
+  const r1 = ok().flatMap(work);
+  eq<typeof r1, Result<string, number>>(true);
+  const r2 = err().flatMap(work);
+  eq<typeof r2, Err<number>>(true);
+  const r3 = work().flatMap(work2);
+  eq<typeof r3, Result<symbol, string | number>>(true);
+}
+//#endregion
 //#region mapErr(mapper)
 {
   const r1 = ok().mapErr(Symbol);
@@ -161,6 +172,6 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
   eq<typeof r3, Result<[string, never, string], number>>(true);
 }
 //#endregion
-function expect_string(x: string) {}
+function expect_string(x: string) { }
 function expect_never(x: never) {}
 function eq<A, B>(x: IsExact<A, B>) {}

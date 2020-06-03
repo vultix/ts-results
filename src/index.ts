@@ -46,6 +46,10 @@ export class Err<E> {
         return this;
     }
 
+    flatMap<T2, E2>(mapper: (val: never) => Result<T2, E2>): Err<E> {
+        return this;
+    }
+
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
     }
@@ -83,6 +87,10 @@ export class Ok<T> {
         return new Ok(mapper(this.val));
     }
 
+    flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
+        return mapper(this.val);
+    }
+
     mapErr<E2>(_mapper: (err: never) => E2): Ok<T> {
         return this;
     }
@@ -90,7 +98,7 @@ export class Ok<T> {
 
 export type Result<T, E> = (Ok<T> | Err<E>) & {
     map<T2>(mapper: (val: T) => T2): Result<T2, E>;
-
+    flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
     mapErr<E2>(mapper: (val: E) => E2): Result<T, E2>;
 };
 
