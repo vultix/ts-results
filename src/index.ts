@@ -65,7 +65,6 @@ export declare function Err<E>(val: E): Err<E>;
 export class Err<E> implements Base<never, E> {
     /** An empty Err */
     static readonly EMPTY = new Err<void>(undefined);
-    static wrap = wrap;
 
     readonly ok = false;
     readonly err = true;
@@ -105,7 +104,6 @@ export declare function Ok<T>(val: T): Ok<T>;
 // @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
 export class Ok<T> implements Base<T, never> {
     static readonly EMPTY = new Ok<void>(undefined);
-    static wrap = wrap;
 
     readonly ok = true;
     readonly err = false;
@@ -176,7 +174,7 @@ function callable(constructor: any) {
  * Wrap a operation that may throw an Error (`try-catch` style) into checked exception style
  * @param op The operation function
  */
-function wrap<T>(op: () => T) {
+export function wrap<T>(op: () => T) {
     try {
         return new Ok(op());
     } catch (e) {

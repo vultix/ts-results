@@ -6,6 +6,7 @@ import {
     ResultOkType,
     ResultErrType,
     Results,
+    wrap,
 } from "../dist/index";
 
 declare function work(): Result<string, number>;
@@ -199,7 +200,7 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
 //#endregion
 //#region static wrap
 {
-    const a = Ok.wrap(() => 1);
+    const a = wrap(() => 1);
     assert<IsExact<typeof a, Result<number, unknown>>>(true);
 }
 //#endregion
