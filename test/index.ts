@@ -222,6 +222,19 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
     assert<IsExact<typeof a, Result<number, unknown>>>(true);
 }
 //#endregion
+//#region safeUnwrap
+{
+    expect_string(ok().safeUnwrap(), true);
+    // @ts-expect-error
+    err().safeUnwrap();
+    // @ts-expect-error
+    work().safeUnwrap();
+    const k = work();
+    if (k.ok) k.safeUnwrap();
+    // @ts-expect-error
+    else k.safeUnwrap();
+}
+//#endregion
 function expect_string<T>(x: T, y: IsExact<T, string>) {}
 function expect_never<T>(x: T, y: IsNever<T>) {}
 function eq<A, B>(x: IsExact<A, B>) {}

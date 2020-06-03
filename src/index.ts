@@ -11,7 +11,6 @@
  * pub fn expect_err(self, msg: &str) -> E
  * pub fn unwrap_err(self) -> E
  * pub fn unwrap_or_default(self) -> T
- * pub fn into_ok(self) -> T
  */
 
 // This interface is used to inherit document
@@ -33,6 +32,8 @@ interface Base<T, E> {
     // Suggestion: Rename to unwrapOr
     /**
      * Returns the contained `Ok` value or a provided default.
+     * 
+     *  (This is the `unwrap_or` in rust)
      */
     else<T2>(val: T2): T | T2;
     /**
@@ -54,6 +55,15 @@ interface Base<T, E> {
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
+    /**
+     * Returns the contained `Ok` value, but never throws.
+     * Unlike `unwrap()`, this method is known to never throw on the result types.
+     * Therefore, it can be used instead of `unwrap()` as a maintainability safeguard
+     * that will fail to compile if the error type of the Result is later changed to an error that can actually occur.
+     * 
+     * (this is the `into_ok()` in rust)
+     */
+    safeUnwrap: unknown;
 }
 /**
  * Contains the error value
@@ -96,6 +106,7 @@ export class Err<E> implements Base<never, E> {
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
     }
+    declare safeUnwrap: unknown
 }
 
 // @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
@@ -130,6 +141,9 @@ export class Ok<T> implements Base<T, never> {
     }
     mapErr<E2>(_mapper: (err: never) => E2): Ok<T> {
         return this;
+    }
+    safeUnwrap() {
+        return this.val;
     }
 }
 
