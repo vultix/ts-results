@@ -120,13 +120,13 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
     eq<typeof r3, Result<symbol, number>>(true);
 }
 //#endregion
-//#region flatMap
+//#region andThen
 {
-    const r1 = ok().flatMap(work);
+    const r1 = ok().andThen(work);
     eq<typeof r1, Result<string, number>>(true);
-    const r2 = err().flatMap(work);
+    const r2 = err().andThen(work);
     eq<typeof r2, Err<number>>(true);
-    const r3 = work().flatMap(work2);
+    const r3 = work().andThen(work2);
     eq<typeof r3, Result<symbol, string | number>>(true);
 }
 //#endregion
