@@ -32,7 +32,7 @@ interface Base<T, E> {
     // Suggestion: Rename to unwrapOr
     /**
      * Returns the contained `Ok` value or a provided default.
-     * 
+     *
      *  (This is the `unwrap_or` in rust)
      */
     else<T2>(val: T2): T | T2;
@@ -60,7 +60,7 @@ interface Base<T, E> {
      * Unlike `unwrap()`, this method is known to never throw on the result types.
      * Therefore, it can be used instead of `unwrap()` as a maintainability safeguard
      * that will fail to compile if the error type of the Result is later changed to an error that can actually occur.
-     * 
+     *
      * (this is the `into_ok()` in rust)
      */
     safeUnwrap: unknown;
@@ -106,7 +106,7 @@ export class Err<E> implements Base<never, E> {
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
     }
-    declare safeUnwrap: unknown
+    declare safeUnwrap: unknown;
 }
 
 // @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
@@ -151,17 +151,20 @@ export type Result<T, E> = (Ok<T> | Err<E>) & Base<T, E>;
 
 export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
 export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
+
+type ReduceOk<T extends any[]> = {
+    [key in keyof T]: T[key] extends Result<infer U, any> ? U : never;
+};
+type ReduceErr<T extends any[]> = {
+    [key in keyof T]: T[key] extends Result<any, infer U> ? U : never;
+};
 // Suggest to rename to all
 /**
  * Parse a set of `Result`s, short-circuits when an input value is `Err`.
  */
-export function Results(): Result<[], never>;
-export function Results<T1, E1>(result1: Result<T1, E1>): Result<[T1], E1>;
-export function Results<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<[T1, T2], E1 | E2>;
-export function Results<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<[T1, T2, T3], E1 | E2 | E3>;
-export function Results<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<[T1, T2, T3, T4], E1 | E2 | E3 | E4>;
-export function Results<T, E>(...results: Result<T, E>[]): Result<T[], E>;
-export function Results(...results: Result<any, any>[]): Result<any[], any> {
+export function Results<T extends Result<any, any>[]>(
+    ...results: T
+): Result<ReduceOk<T>, ReduceErr<T>[number]> {
     const okResult = [];
     for (let result of results) {
         if (result.ok) {
@@ -170,23 +173,21 @@ export function Results(...results: Result<any, any>[]): Result<any[], any> {
             return result.val;
         }
     }
-    return new Ok(okResult);
+    return new Ok(okResult as ReduceOk<T>);
 }
+
 /**
  * Parse a set of `Result`s, short-circuits when an input value is `Ok`.
  */
-export function any(): Result<void, never>;
-export function any<T1, E1>(result1: Result<T1, E1>): Result<T1, E1>;
-export function any<T1, E1, T2, E2>(result1: Result<T1, E1>, result2: Result<T2, E2>): Result<T1 | T2, E1 | E2>;
-export function any<T1, E1, T2, E2, T3, E3>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>): Result<T1 | T2 | T3, E1 | E2 | E3>;
-export function any<T1, E1, T2, E2, T3, E3, T4, E4>(result1: Result<T1, E1>, result2: Result<T2, E2>, result3: Result<T3, E3>, result4: Result<T4, E4>): Result<T1 | T2 | T3 | T4, E1 | E2 | E3 | E4>;
-export function any<T, E>(...results: Result<T, E>[]): Result<T, E>;
-export function any(...results: Result<any, any>[]): Result<any, any> {
+export function any<T extends Result<any, any>[]>(
+    ...results: T
+): Result<ReduceOk<T>[number], ReduceErr<T>[number]> {
+    if (results.length === 0) return Ok.EMPTY as any;
     // short-circuits
-    for (const result of results) if (result.ok) return result;
-    if (results.length === 0) return Ok.EMPTY;
+    for (const result of results)
+        if (result.ok) return (result as Result<any, any>) as any;
     // it must be a Err
-    return results[results.length - 1];
+    return results[results.length - 1] as any;
 }
 function toString(val: unknown) {
     let value = "".toString.call(val);
