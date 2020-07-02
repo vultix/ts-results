@@ -14,7 +14,7 @@
  */
 
 // This interface is used to inherit document
-interface Base<T, E> {
+interface Base<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the result is Ok */ readonly ok: boolean;
     /** `true` when the result is Err */ readonly err: boolean;
     /**
@@ -119,9 +119,14 @@ export class Ok<T> implements Base<T, never> {
     readonly ok = true;
     readonly err = false;
 
-    [Symbol.iterator](): T extends Iterable<infer U> ? Iterator<U> : never {
-        // @ts-ignore
-        return this.val[Symbol.iterator]();
+    [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
+        const obj = Object(this.val) as Iterable<any>;
+
+        return Symbol.iterator in obj ? obj[Symbol.iterator]() : {
+            next(): IteratorResult<never, never> {
+                return { done: true, value: undefined! };
+            },
+        };
     }
     constructor(public readonly val: T) {}
     else(_val: unknown): T {
