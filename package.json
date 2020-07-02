@@ -4,14 +4,16 @@
   "description": "",
   "scripts": {
     "build": "npm run clean && tsc && copyfiles README.md LICENSE src/package.json dist --flat",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "tsc -p ./test/tsconfig.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "copyfiles": "^2.1.0",
-    "rxjs": "^6.1.0",
-    "typescript": "^3.3.3"
+    "conditional-type-checks": "^1.0.5",
+    "copyfiles": "^2.3.0",
+    "rxjs": "^6.5.5",
+    "typescript": "^3.9.3"
   }
 }

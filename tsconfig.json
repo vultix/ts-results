@@ -4,6 +4,7 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "declaration": true,
+    "declarationMap": true,
     "moduleResolution": "node",
     "module": "es2015",
     "noEmitHelpers": false,
@@ -13,14 +14,9 @@
     "noImplicitReturns": true,
     "baseUrl": "./",
     "target": "es6",
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "./dist",
-    "**/*.spec.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "./dist", "**/*.spec.ts"]
 }
