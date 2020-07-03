@@ -1,6 +1,6 @@
 import { ObservableInput, of, OperatorFunction } from 'rxjs';
 import { filter, map, mergeMap, switchMap } from 'rxjs/operators';
-import { Err, Ok, Result } from './index';
+import { Err, Ok, Result } from '../index';
 
 export function resultMap<T, T2, E>(mapper: (val: T) => T2): OperatorFunction<Result<T, E>, Result<T2, E>> {
     return (source) => {

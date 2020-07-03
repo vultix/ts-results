@@ -3,7 +3,9 @@
   "version": "2.0.1",
   "description": "",
   "scripts": {
-    "build": "npm run clean && tsc && copyfiles README.md LICENSE src/package.json dist --flat",
+    "build": "npm run clean && npm run build:ts && npm run build:copy",
+    "build:ts": "tsc -p tsconfig.json && tsc -p tsconfig.json -m esnext --outDir dist/esm/ -d false -declarationMap false",
+    "build:copy": "copyfiles README.md LICENSE dist && copyfiles src/**/package.json dist --up 1",
     "clean": "rm -rf dist",
     "test": "tsc -p ./test/tsconfig.json"
   },
