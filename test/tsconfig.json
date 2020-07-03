@@ -1,9 +1,13 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "strict": true,
-    "noEmit": true,
-    "moduleResolution": "Node"
+    "baseUrl": "./",
+    "sourceMap": true,
+    "declaration": false,
+    "declarationMap": false,
+    "module": "commonjs",
+    "downlevelIteration": true
   },
-  "include": ["./**/*.ts"]
+  "include": ["../src/**/*.ts", "./**/*.ts"],
+  "exclude": []
 }

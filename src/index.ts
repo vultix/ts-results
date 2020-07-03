@@ -74,13 +74,15 @@ export declare function Err<E>(val: E): Err<E>;
 
 /**
  * Contains the error value
- */ // @ts-ignore
+ */
+// @ts-ignore
 export class Err<E> implements BaseResult<never, E> {
     /** An empty Err */
     static readonly EMPTY = new Err<void>(undefined);
 
-    readonly ok = false;
-    readonly err = true;
+    readonly ok!: false;
+    readonly err!: true;
+    readonly val!: E;
 
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
@@ -90,10 +92,14 @@ export class Err<E> implements BaseResult<never, E> {
         };
     }
 
-    constructor(public readonly val: E) {
+    constructor(val: E) {
         if (!(this instanceof Err)) {
             return new Err(val);
         }
+
+        this.ok = false;
+        this.err = true;
+        this.val = val;
     }
 
     /**
@@ -134,12 +140,14 @@ export declare function Ok<T>(val: T): Ok<T>;
 
 /**
  * Contains the success value
- */ // @ts-ignore
+ */
+// @ts-ignore
 export class Ok<T> implements BaseResult<T, never> {
     static readonly EMPTY = new Ok<void>(undefined);
 
-    readonly ok = true;
-    readonly err = false;
+    readonly ok!: true;
+    readonly err!: false;
+    readonly val!: T;
 
     /**
      * Helper function if you know you have an Ok<T> and T is iterable
@@ -154,10 +162,14 @@ export class Ok<T> implements BaseResult<T, never> {
         };
     }
 
-    constructor(public readonly val: T) {
+    constructor(val: T) {
         if (!(this instanceof Ok)) {
             return new Ok(val);
         }
+
+        this.ok = true;
+        this.err = false;
+        this.val = val;
     }
 
     /**
@@ -286,11 +298,11 @@ export namespace Result {
     }
 }
 
-function toString(val: unknown) {
-    let value = ''.toString.call(val);
+function toString(val: unknown): string {
+    let value = String(val);
     if (value === '[object Object]') {
         try {
-            value = JSON.stringify(value);
+            value = JSON.stringify(val);
         } catch {
         }
     }
