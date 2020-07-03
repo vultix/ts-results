@@ -12,15 +12,16 @@
  * pub fn unwrap_err(self) -> E
  * pub fn unwrap_or_default(self) -> T
  */
-
-// This interface is used to inherit document
-interface Base<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
+interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the result is Ok */ readonly ok: boolean;
     /** `true` when the result is Err */ readonly err: boolean;
+
     /**
-     * Returns the contained `Ok` value.
+     * Returns the contained `Ok` value, if exists.  Throws an error if not.
+     * @param msg the message to throw if no Ok value.
      */
     expect(msg: string): T;
+
     /**
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
@@ -29,18 +30,28 @@ interface Base<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
      * Throws if the value is an `Err`, with a message provided by the `Err`'s value.
      */
     unwrap(): T;
-    // Suggestion: Rename to unwrapOr
+
+    /**
+     * Returns the contained `Ok` value or a provided default.
+     *
+     *  @see unwrapOr
+     *  @deprecated in favor of unwrapOr
+     */
+    else<T2>(val: T2): T | T2;
+
     /**
      * Returns the contained `Ok` value or a provided default.
      *
      *  (This is the `unwrap_or` in rust)
      */
-    else<T2>(val: T2): T | T2;
+    unwrapOr<T2>(val: T2): T | T2;
+
     /**
-     * Calls `op` if the result is `Ok`, otherwise returns the `Err` value of self.
+     * Calls `mapper` if the result is `Ok`, otherwise returns the `Err` value of self.
      * This function can be used for control flow based on `Result` values.
      */
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
+
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value,
      * leaving an `Err` value untouched.
@@ -48,6 +59,7 @@ interface Base<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
      * This function can be used to compose the results of two functions.
      */
     map<U>(mapper: (val: T) => U): Result<U, E>;
+
     /**
      * Maps a `Result<T, E>` to `Result<T, F>` by applying a function to a contained `Err` value,
      * leaving an `Ok` value untouched.
@@ -55,24 +67,15 @@ interface Base<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
-    /**
-     * Returns the contained `Ok` value, but never throws.
-     * Unlike `unwrap()`, this method is known to never throw on the result types.
-     * Therefore, it can be used instead of `unwrap()` as a maintainability safeguard
-     * that will fail to compile if the error type of the Result is later changed to an error that can actually occur.
-     *
-     * (this is the `into_ok()` in rust)
-     */
-    safeUnwrap: unknown;
 }
+
+// @ts-ignore
+export declare function Err<E>(val: E): Err<E>;
+
 /**
  * Contains the error value
- */
-// @ts-expect-error Duplicate identifier 'Err'.ts(2300)
-export declare function Err<E>(val: E): Err<E>;
-@callable
-// @ts-expect-error Duplicate identifier 'Err'.ts(2300)
-export class Err<E> implements Base<never, E> {
+ */ // @ts-ignore
+export class Err<E> implements BaseResult<never, E> {
     /** An empty Err */
     static readonly EMPTY = new Err<void>(undefined);
 
@@ -82,142 +85,216 @@ export class Err<E> implements Base<never, E> {
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
             next(): IteratorResult<never, never> {
-                return { done: true, value: undefined! };
-            },
+                return {done: true, value: undefined!};
+            }
         };
     }
-    constructor(public readonly val: E) {}
 
+    constructor(public readonly val: E) {
+        if (!(this instanceof Err)) {
+            return new Err(val);
+        }
+    }
+
+    /**
+     * @deprecated in favor of unwrapOr
+     * @see unwrapOr
+     */
     else<T2>(val: T2): T2 {
         return val;
     }
+
+    unwrapOr<T2>(val: T2): T2 {
+        return val;
+    }
+
     expect(msg: string): never {
         throw new Error(`${msg} - Error: ${toString(this.val)}`);
     }
+
     unwrap(): never {
         throw new Error(`Tried to unwrap Error: ${toString(this.val)}`);
     }
+
     map<T2>(_mapper: (val: never) => T2): Err<E> {
         return this;
     }
+
     andThen<T2, E2>(op: (val: never) => Result<T2, E2>): Err<E> {
         return this;
     }
+
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
     }
-    declare safeUnwrap: unknown;
 }
 
-// @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
+// @ts-ignore
 export declare function Ok<T>(val: T): Ok<T>;
-@callable
-// @ts-expect-error Duplicate identifier 'Ok'.ts(2300)
-export class Ok<T> implements Base<T, never> {
+
+/**
+ * Contains the success value
+ */ // @ts-ignore
+export class Ok<T> implements BaseResult<T, never> {
     static readonly EMPTY = new Ok<void>(undefined);
 
     readonly ok = true;
     readonly err = false;
 
+    /**
+     * Helper function if you know you have an Ok<T> and T is iterable
+     */
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
         const obj = Object(this.val) as Iterable<any>;
 
         return Symbol.iterator in obj ? obj[Symbol.iterator]() : {
             next(): IteratorResult<never, never> {
-                return { done: true, value: undefined! };
-            },
+                return {done: true, value: undefined!};
+            }
         };
     }
-    constructor(public readonly val: T) {}
+
+    constructor(public readonly val: T) {
+        if (!(this instanceof Ok)) {
+            return new Ok(val);
+        }
+    }
+
+    /**
+     * @see unwrapOr
+     * @deprecated in favor of unwrapOr
+     */
     else(_val: unknown): T {
         return this.val;
     }
+
+    unwrapOr(_val: unknown): T {
+        return this.val;
+    }
+
     expect(_msg: string): T {
         return this.val;
     }
+
     unwrap(): T {
         return this.val;
     }
+
     map<T2>(mapper: (val: T) => T2): Ok<T2> {
         return new Ok(mapper(this.val));
     }
+
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
         return mapper(this.val);
     }
+
     mapErr<E2>(_mapper: (err: never) => E2): Ok<T> {
         return this;
     }
-    safeUnwrap() {
+
+    /**
+     * Returns the contained `Ok` value, but never throws.
+     * Unlike `unwrap()`, this method doesn't throw and is only callable on an Ok<T>
+     *
+     * Therefore, it can be used instead of `unwrap()` as a maintainability safeguard
+     * that will fail to compile if the error type of the Result is later changed to an error that can actually occur.
+     *
+     * (this is the `into_ok()` in rust)
+     */
+    safeUnwrap(): T {
         return this.val;
     }
 }
 
-export type Result<T, E> = (Ok<T> | Err<E>) & Base<T, E>;
+
+export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
 
 export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
 export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
 
-type ReduceOk<T extends any[]> = {
+export type ResultOkTypes<T extends Result<any, any>[]> = {
     [key in keyof T]: T[key] extends Result<infer U, any> ? U : never;
 };
-type ReduceErr<T extends any[]> = {
+export type ResultErrTypes<T extends Result<any, any>[]> = {
     [key in keyof T]: T[key] extends Result<any, infer U> ? U : never;
 };
-// Suggest to rename to all
-/**
- * Parse a set of `Result`s, short-circuits when an input value is `Err`.
- */
-export function Results<T extends Result<any, any>[]>(
-    ...results: T
-): Result<ReduceOk<T>, ReduceErr<T>[number]> {
-    const okResult = [];
-    for (let result of results) {
-        if (result.ok) {
-            okResult.push(result.val);
-        } else {
-            return result.val;
+
+export namespace Result {
+    /**
+     * Parse a set of `Result`s, returning an array of all `Ok` values.
+     * Short circuits with the first `Err` found, if any
+     */
+    export function all<T extends Result<any, any>[]>(
+      ...results: T
+    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
+        const okResult = [];
+        for (let result of results) {
+            if (result.ok) {
+                okResult.push(result.val);
+            } else {
+                return result as Err<ResultErrTypes<T>[number]>;
+            }
+        }
+
+        return new Ok(okResult as ResultOkTypes<T>);
+    }
+
+    /**
+     * Parse a set of `Result`s, short-circuits when an input value is `Ok`.
+     * If no `Ok` is found, returns an `Err` containing the collected error values
+     */
+    export function any<T extends Result<any, any>[]>(
+      ...results: T
+    ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>> {
+        const errResult = [];
+
+        // short-circuits
+        for (const result of results) {
+            if (result.ok) {
+                return result as Ok<ResultOkTypes<T>[number]>;
+            } else {
+                errResult.push(result.val);
+            }
+        }
+
+        // it must be a Err
+        return new Err(errResult as ResultErrTypes<T>);
+    }
+
+    /**
+     * Wrap an operation that may throw an Error (`try-catch` style) into checked exception style
+     * @param op The operation function
+     */
+    export function wrap<T, E = unknown>(op: () => T): Result<T, E> {
+        try {
+            return new Ok(op());
+        } catch (e) {
+            return new Err<E>(e);
         }
     }
-    return new Ok(okResult as ReduceOk<T>);
+
+    /**
+     * Wrap an async operation that may throw an Error (`try-catch` style) into checked exception style
+     * @param op The operation function
+     */
+    export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
+        try {
+            return op().then(val => new Ok(val)).catch(e => new Err(e));
+        } catch (e) {
+            return Promise.resolve(new Err(e));
+        }
+    }
 }
 
-/**
- * Parse a set of `Result`s, short-circuits when an input value is `Ok`.
- */
-export function any<T extends Result<any, any>[]>(
-    ...results: T
-): Result<ReduceOk<T>[number], ReduceErr<T>[number]> {
-    if (results.length === 0) return Ok.EMPTY as any;
-    // short-circuits
-    for (const result of results)
-        if (result.ok) return (result as Result<any, any>) as any;
-    // it must be a Err
-    return results[results.length - 1] as any;
-}
 function toString(val: unknown) {
-    let value = "".toString.call(val);
-    if (value === "[object Object]") {
+    let value = ''.toString.call(val);
+    if (value === '[object Object]') {
         try {
             value = JSON.stringify(value);
-        } catch {}
+        } catch {
+        }
     }
     return value;
 }
-function callable(constructor: any) {
-    return new Proxy(constructor, {
-        apply(target: any, thisArg: any, argArray?: any) {
-            return new target(...argArray);
-        },
-    });
-}
-/**
- * Wrap a operation that may throw an Error (`try-catch` style) into checked exception style
- * @param op The operation function
- */
-export function wrap<T>(op: () => T) {
-    try {
-        return new Ok(op());
-    } catch (e) {
-        return new Err<unknown>(e);
-    }
-}
+
+const x = Result.all(Ok(3) as Result<number, string>, Err(5) as Result<4, 5>);

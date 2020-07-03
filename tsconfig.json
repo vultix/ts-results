@@ -13,7 +13,7 @@
     "strict": true,
     "noImplicitReturns": true,
     "baseUrl": "./",
-    "target": "es6",
+    "target": "es5",
     "importHelpers": true,
     "forceConsistentCasingInFileNames": true,
     "experimentalDecorators": true

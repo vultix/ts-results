@@ -5,9 +5,6 @@ import {
     Result,
     ResultOkType,
     ResultErrType,
-    Results,
-    wrap,
-    any,
 } from "../dist/index";
 
 declare function work(): Result<string, number>;
@@ -162,17 +159,17 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
 //#endregion
 //#region Results(...args)
 {
-    const r0 = Results();
+    const r0 = Result.all();
     eq<typeof r0, Result<[], never>>(true);
-    const r1 = Results(work());
+    const r1 = Result.all(work());
     eq<typeof r1, Result<[string], number>>(true);
-    const r2 = Results(work(), work());
+    const r2 = Result.all(work(), work());
     eq<typeof r2, Result<[string, string], number>>(true);
-    const r3 = Results(ok(), err(), work());
+    const r3 = Result.all(ok(), err(), work());
     eq<typeof r3, Result<[string, never, string], number>>(true);
-    const r4 = Results(...([] as Result<string, number>[]));
+    const r4 = Result.all(...([] as Result<string, number>[]));
     eq<typeof r4, Result<string[], number>>(true);
-    const r5 = Results(
+    const r5 = Result.all(
         Ok(2 as const),
         Err(1 as const),
         Ok(3 as const),
@@ -183,24 +180,23 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
 //#endregion
 //#region any(...args)
 {
-    type T = Result<string, number>;
-    const r0 = any();
-    eq<typeof r0, Result<never, never>>(true);
-    const r1 = any(work());
-    eq<typeof r1, T>(true);
-    const r2 = any(work(), work());
-    eq<typeof r2, T>(true);
-    const r3 = any(ok(), err(), work());
-    eq<typeof r3, T>(true);
-    const r4 = any(...([] as Result<string, number>[]));
-    eq<typeof r4, T>(true);
-    const r5 = any(
+    const r0 = Result.any();
+    eq<typeof r0, Result<never, []>>(true);
+    const r1 = Result.any(work());
+    eq<typeof r1, Result<string, [number]>>(true);
+    const r2 = Result.any(work(), work());
+    eq<typeof r2, Result<string, [number, number]>>(true);
+    const r3 = Result.any(ok(), err(), work());
+    eq<typeof r3, Result<string, [never, number, number]>>(true);
+    const r4 = Result.any(...([] as Result<string, number>[]));
+    eq<typeof r4, Result<string, number[]>>(true);
+    const r5 = Result.any(
         Ok(2 as const),
         Err(1 as const),
         Ok(3 as const),
         Err(0 as const)
     );
-    eq<typeof r5, Result<2 | 3, 1 | 0>>(true);
+    eq<typeof r5, Result<2 | 3, [never, 1, never, 0]>>(true);
 }
 //#endregion
 //#region Iterable<T>
@@ -225,15 +221,34 @@ eq<typeof Ok.EMPTY, Ok<void>>(true);
             "Unreachable, Err@@iterator should emit no value and return"
         );
     }
-    // @ts-expect-error An iterator must have a 'next()' method.ts(2489)
-    for (const expectError of Ok(1)) {
+    for (const item of Ok(1)) {
+        expect_never(item, true);
+
+        throw new Error(
+          "Unreachable, Err@@iterator should emit no value and return"
+        );
     }
 }
 //#endregion
 //#region static wrap
 {
-    const a = wrap(() => 1);
+    const a = Result.wrap(() => 1);
     assert<IsExact<typeof a, Result<number, unknown>>>(true);
+
+    class CustomError {}
+    const b = Result.wrap<number, CustomError>(() => 3);
+    assert<IsExact<typeof b, Result<number, CustomError>>>(true);
+}
+//#endregion
+//#endregion
+//#region static wrapAsync
+{
+    const a = Result.wrapAsync(async () => 1);
+    assert<IsExact<typeof a, Promise<Result<number, unknown>>>>(true);
+
+    class CustomError {}
+    const b = Result.wrapAsync<number, CustomError>(async () => 3);
+    assert<IsExact<typeof b, Promise<Result<number, CustomError>>>>(true);
 }
 //#endregion
 //#region safeUnwrap
