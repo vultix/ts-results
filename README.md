@@ -13,8 +13,11 @@ A typescript implementation of [Rust's Result](https://doc.rust-lang.org/std/res
     * [Expect](#expect) 	
     * [Map, MapErr](#map-and-maperr)
     * [Else](#else)
+    * [UnwrapOr](#unwrapor)
     * [Empty](#empty)
     * [Combining Results](#combining-results)
+        * [Result.all](#result-all)
+        * [Result.any](#result-any)
 * [Usage with rxjs](#usage-with-rxjs)
     * [resultMap](#resultmap)
     * [resultMapErr](#resultmaperr)
@@ -59,9 +62,9 @@ import {Ok, Err, Result} from 'ts-results';
 
 function readFile(path: string): Result<string, 'invalid path'> {
     if (existsSync(path)) {
-        return new Ok(readFileSync(path));
+        return new Ok(readFileSync(path)); // new is optional here
     } else {
-        return new Err("invalid path");
+        return new Err("invalid path"); // new is optional here
     }
 }
 
@@ -78,14 +81,14 @@ if (result.ok) {
 
 ## Usage
 ```typescript
-import { Result, Err, Ok, Results } from 'ts-results';
+import { Result, Err, Ok } from 'ts-results';
 ```
 #### Creation
 ```typescript
-let okResult: Result<number, Error> = new Ok(10);
+let okResult: Result<number, Error> = Ok(10);
 let okResult2 = Ok<number, Error>(10); // Exact same as above
 
-let errorResult: Result<number, Error> = new Ok(new Error('bad number!'));
+let errorResult: Result<number, Error> = Ok(new Error('bad number!'));
 let errorResult2 = Ok<number, Error>(new Error('bad number!')); // Exact same as above
 
 ```
@@ -130,8 +133,8 @@ badResult.expect('badResult should be a number'); // throws Error("badResult sho
 
 #### Map and MapErr
 ```typescript
-let goodResult = new Ok(1);
-let badResult = new Err(new Error("something went wrong"));
+let goodResult = Ok(1);
+let badResult = Err(new Error("something went wrong"));
 
 goodResult.map(num => num + 1).unwrap(); // 2
 badResult.map(num => num + 1).unwrap(); // throws Error("something went wrong")
@@ -141,12 +144,15 @@ badResult.map(num => num + 1).mapErr(err => new Error('mapped')).unwrap(); // th
 ```
 
 #### Else
-```typescript
-let goodResult = new Ok(1);
-let badResult = new Err(new Error("something went wrong"));
+Deprecated in favor of unwrapOr
 
-goodResult.else(5); // 1
-badResult.else(5); // 5
+#### UnwrapOr
+```typescript
+let goodResult = Ok(1);
+let badResult = Err(new Error("something went wrong"));
+
+goodResult.unwrapOr(5); // 1
+badResult.unwrapOr(5); // 5
 ```
 
 #### Empty
@@ -161,16 +167,29 @@ function checkIsValid(isValid: boolean): Result<void, Error> {
 ```
 
 #### Combining Results
-There may be some cases where we have two or more separate `Result` objects and we want to do something with both values.
-This is handled by using the `Results` function to combine them.
+`ts-results` has two helper functions for operating over n `Result` objects.
 
+##### Result.all
+Either returns all of the `Ok` values, or the first `Err` value
 ```typescript
 let pizzaResult: Result<Pizza, GetPizzaError> = getPizzaSomehow();
 let toppingsResult: Result<Toppings, GetToppingsError> = getToppingsSomehow();
 
-let result = Results(pizzaResult, toppingsResult); // Result<[Pizza, Toppings], GetPizzaError | GetToppingsError>
+let result = Result.all(pizzaResult, toppingsResult); // Result<[Pizza, Toppings], GetPizzaError | GetToppingsError>
 
 let [pizza, toppings] = result.unwrap(); // pizza is a Pizza, toppings is a Toppings.  Could throw GetPizzaError or GetToppingsError.
+``` 
+
+##### Result.any
+Either returns the first `Ok` value, or all `Err` values
+```typescript
+let url1: Result<string, Error1> = attempt1();
+let url2: Result<string, Error2> = attempt2();
+let url3: Result<string, Error3> = attempt3();
+
+let result = Result.all(url1, url2, url3); // Result<string, Error1 | Error2 | Error3>
+
+let url = result.unwrap(); // At least one attempt gave us a successful url
 ``` 
 
 ## Usage with rxjs
@@ -182,7 +201,7 @@ import {of, Observable} from 'rxjs';
 import {Ok, Err, Result} from 'ts-results';
 import {resultMap} from 'ts-results/rxjs-operators';
 
-const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err('uh oh'));
+const obs$: Observable<Result<number, Error>> = of(Ok(5), Err('uh oh'));
 
 const greaterThanZero = obs$.pipe(
   resultMap(number => number > 0), // Doubles the value
@@ -228,7 +247,7 @@ import {of, Observable} from 'rxjs';
 import {Ok, Err, Result} from 'ts-results';
 import {elseMap} from 'ts-results/rxjs-operators';
 
-const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
+const obs$: Observable<Result<number, Error>> = of(Ok(5), Err(new Error('uh oh')));
 
 const doubled = obs$.pipe(
   elseMap(err => {

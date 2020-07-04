@@ -8,6 +8,21 @@ test('Err<E> | Ok<T> should be Result<T, E>', () => {
     eq<typeof r, Result<string, number>>(true);
 });
 
+test('Type can be narrowed using ok & err', () => {
+    const r1 = new Ok(0) as Result<number, string>;
+    if (r1.ok) {
+        eq<Ok<number>, typeof r1>(true);
+    } else {
+        eq<Err<string>, typeof r1>(true);
+    }
+
+    if (r1.err) {
+        eq<Err<string>, typeof r1>(true);
+    } else {
+        eq<Ok<number>, typeof r1>(true);
+    }
+})
+
 test('map', () => {
     const r = new Err(0) as Result<string, number>;
     const r2 = r.map(Symbol);

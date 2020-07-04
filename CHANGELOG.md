@@ -1,3 +1,18 @@
+# v3.0.0
+Huge shout out to [@Jack-Works](https://github.com/Jack-Works) for helping get this release out.
+Most of the work was his, and it would not have happened without him.
+### New Features
+* `Ok<T>` and `Err<T>` are now callable without `new`!
+* No longer breaks when calling from node
+* Tree-shakable when using tools like rollup or webpack
+* Fully unit tested
+* Added these helper functions:
+  * `Result.all(...)` - Same as `Results` from previous releases.  Collects all `Ok` values, or returns the first `Err` value.
+  * `Results.any(...)` - Returns the first `Ok` value, or all of the `Err` values.
+  * `Result.wrap<T, E>(() => ...)` - Wraps an operation that may throw an error, uses try / catch to return a `Result<T, E>`
+  * `Result.wrapAsync<T, E>(() => ...)` - Same as the above, but async  
+* Deprecated `else` in favor of `unwrapOr` to prefer api parity with Rust
+
 # v2.0.1
 ### New Features
 * **core:** Added `reaonly static EMPTY: Ok<void>;` to `Ok` class. 

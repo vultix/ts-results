@@ -1,8 +1,9 @@
 {
   "name": "ts-results",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "A typescript implementation of Rust's Result object.",
   "main": "index.js",
+  "module": "./esm/index.js",
   "types": "index.d.ts",
   "keywords": ["typescript", "rust", "errors", "result"],
   "author": "Aidan Grant",
