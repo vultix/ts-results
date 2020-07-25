@@ -1,7 +1,7 @@
 # ts-results
 A typescript implementation of [Rust's Result](https://doc.rust-lang.org/std/result/) object.  Brings compile-time error checking to typescript.
 
-*Note: This is the documentation for the newly released `ts-results@2.0.0` with breaking changes.  To see breaking changes, go to [CHANGELOG.md](https://github.com/vultix/ts-results/blob/master/CHANGELOG.md)*
+*Note: This is the documentation for the newly released `ts-results@3.0.0` with breaking changes.  To see breaking changes, go to [CHANGELOG.md](https://github.com/vultix/ts-results/blob/master/CHANGELOG.md)*
 ## Contents
 
 * [Installation](#installation)
