@@ -67,40 +67,6 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
-
-    /**
-     * Maps a Result of nested Results `Result<Result<Result<T0, E0>, E1>, E2>` to `Result<T0, E0>`
-     * Once there is an ErrResult found along the way it stops and returns that.
-     * Otherwise continues to unwrap till the last OkResult
-     * @param mapper
-     */
-    // flatMap<T2, E2>(mapper: (val: T | E) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-    // flatMap<T2, E2>(mapper: (val: T | E) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-
-    // flatMap<T2, E2>(mapper: (val: any) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-
-    // Err
-    // flatMap(mapper: (val: never) => Result<never, E>): Result<never, E>;
-
-    // // Ok
-    // // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2>;
-
-    // // Ok
-    // // flatMap<T2>(mapper: (val: T) => Result<T2, never>): Result<FlattenResults<T2>, never>;
-    // // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-    // // flatMap<T2>(mapper: (val: T) => Result<T2, E>): Result<FlattenResults<T2>, E>;
-    // // flatMap<T2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-    // flatMap<T2>(mapper: (val: T) => Ok<T2>): Result<FlattenResults<T2>, never>;
-    // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-
-    // These 2 need to be merged into 1 for ts to work
-    // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
-    // flatMap<T2>(mapper: (val: T) => Result<T2, E>): Result<FlattenResults<T2>, E>;
-    // flatMap(mapper: (val: never) => Result<never, E>): Result<never, E>;
-
-    // flatMap<T2, E2>(
-    //     mapper: ((val: T) => Result<T2, E2>) | ((val: never) => Result<never, E>)
-    // ): Result<FlattenResults<T2>, E2> | Result<FlattenResults<T2>, E> | Result<never, E>;
 }
 
 // @ts-ignore
@@ -220,13 +186,11 @@ export class Ok<T> implements BaseResult<T, never> {
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
         const obj = Object(this.val) as Iterable<any>;
 
-        return Symbol.iterator in obj
-            ? obj[Symbol.iterator]()
-            : {
-                  next(): IteratorResult<never, never> {
-                      return { done: true, value: undefined! };
-                  },
-              };
+        return Symbol.iterator in obj ? obj[Symbol.iterator]() : {
+            next(): IteratorResult<never, never> {
+                return { done: true, value: undefined! };
+            },
+        };
     }
 
     constructor(val: T) {
@@ -314,7 +278,7 @@ export namespace Result {
      * Short circuits with the first `Err` found, if any
      */
     export function all<T extends Result<any, any>[]>(
-        ...results: T
+      ...results: T
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
         const okResult = [];
         for (let result of results) {
@@ -333,7 +297,7 @@ export namespace Result {
      * If no `Ok` is found, returns an `Err` containing the collected error values
      */
     export function any<T extends Result<any, any>[]>(
-        ...results: T
+      ...results: T
     ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>> {
         const errResult = [];
 
@@ -368,9 +332,7 @@ export namespace Result {
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
-            return op()
-                .then((val) => new Ok(val))
-                .catch((e) => new Err(e));
+            return op().then((val) => new Ok(val)).catch((e) => new Err(e));
         } catch (e) {
             return Promise.resolve(new Err(e));
         }
@@ -382,7 +344,8 @@ function toString(val: unknown): string {
     if (value === '[object Object]') {
         try {
             value = JSON.stringify(val);
-        } catch {}
+        } catch {
+        }
     }
     return value;
 }
