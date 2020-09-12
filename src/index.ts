@@ -67,10 +67,46 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
+
+    /**
+     * Maps a Result of nested Results `Result<Result<Result<T0, E0>, E1>, E2>` to `Result<T0, E0>`
+     * Once there is an ErrResult found along the way it stops and returns that.
+     * Otherwise continues to unwrap till the last OkResult
+     * @param mapper
+     */
+    flatMap<T2>(mapper: (val: T | E) => Result<T2, E>): Result<FlattenResults<T2>, E>;
 }
 
 // @ts-ignore
 export declare function Err<E>(val: E): Err<E>;
+
+const isResultType = <T, E>(v: unknown): v is Result<T, E> => {
+    return (
+      typeof v === 'object' &&
+      v !== null &&
+      'val' in v &&
+      'ok' in v &&
+      'map' in v &&
+      'mapErr' in v
+    );
+};
+
+
+const recursiveUnwrap = <T2, E>(r: Result<T2, E>): Result<T2, E> => {
+    // If Error just return it
+    if (!r.ok) {
+        return r;
+    }
+
+    const unwrapped = r.val;
+
+    // If not Result just return it with 1 layer of Result
+    if (!isResultType(unwrapped)) {
+        return new Ok(unwrapped) as Result<T2, E>;
+    }
+
+    return recursiveUnwrap<T2, E>(unwrapped as Result<T2, E>);
+}
 
 /**
  * Contains the error value
@@ -132,6 +168,10 @@ export class Err<E> implements BaseResult<never, E> {
 
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
+    }
+
+    flatMap<T2>(mapper: (val: any) => Result<T2, E>): Result<FlattenResults<T2>, E> {
+        return this;
     }
 }
 
@@ -216,8 +256,16 @@ export class Ok<T> implements BaseResult<T, never> {
     safeUnwrap(): T {
         return this.val;
     }
+
+    flatMap<T2, E>(mapper: (val: T) => Result<T2, E>): Result<FlattenResults<T2>, E> {
+        return recursiveUnwrap(mapper(this.val)) as Result<FlattenResults<T2>, E>;
+    }
 }
 
+type FlattenResults<T> = {
+    0: T;
+    1: T extends BaseResult<infer U, any> ? FlattenResults<U> : never;
+  }[T extends BaseResult<any, any> ? 1 : 0];
 
 export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
 
@@ -310,3 +358,4 @@ function toString(val: unknown): string {
 }
 
 const x = Result.all(Ok(3) as Result<number, string>, Err(5) as Result<4, 5>);
+

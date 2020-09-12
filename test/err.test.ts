@@ -92,3 +92,27 @@ test('iterable', () => {
         );
     }
 });
+
+test('flatMap unwraps 1 level Error Result', () => {
+    const r = new Ok(3);
+
+    r.map((v) => v * 2)
+        .flatMap(() => new Err('SimpleError'))
+        .mapErr((s) => expect(s).toBe('SimpleError'));
+});
+
+test('flatMap does NOT unwrap multiple nested Errors Results. This is a job for flatMapErr', () => {
+    const r = new Ok(3);
+
+    const nestedError = new Err('NestedError');
+
+    r.map((v) => v * 2)
+        .flatMap(() => new Err(nestedError))
+        .mapErr((s) => expect(s).toBe(nestedError));
+});
+
+test('flatMap on Err fails with the error', () => {
+  const r = new Err('SomeError');
+
+  r.flatMap((x) => x).mapErr((e) => expect(e).toBe('SomeError'));
+});
