@@ -91,7 +91,7 @@ const recursiveUnwrap = <T2, E2>(r: Result<T2, E2>): Result<T2, E2> => {
 
     const unwrapped = r.val;
 
-    // If not Result just wrap it return it
+    // If not Result just wrap it & return it
     if (!isResultType(unwrapped)) {
         return new Ok(unwrapped) as Result<T2, E2>;
     }
@@ -188,8 +188,8 @@ export class Ok<T> implements BaseResult<T, never> {
 
         return Symbol.iterator in obj ? obj[Symbol.iterator]() : {
             next(): IteratorResult<never, never> {
-                return { done: true, value: undefined! };
-            },
+                return {done: true, value: undefined!};
+            }
         };
     }
 
@@ -332,7 +332,7 @@ export namespace Result {
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
-            return op().then((val) => new Ok(val)).catch((e) => new Err(e));
+            return op().then(val => new Ok(val)).catch(e => new Err(e));
         } catch (e) {
             return Promise.resolve(new Err(e));
         }
