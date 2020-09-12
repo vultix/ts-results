@@ -74,7 +74,33 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Otherwise continues to unwrap till the last OkResult
      * @param mapper
      */
-    flatMap<T2>(mapper: (val: T | E) => Result<T2, E>): Result<FlattenResults<T2>, E>;
+    // flatMap<T2, E2>(mapper: (val: T | E) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+    // flatMap<T2, E2>(mapper: (val: T | E) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+
+    // flatMap<T2, E2>(mapper: (val: any) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+
+    // Err
+    // flatMap(mapper: (val: never) => Result<never, E>): Result<never, E>;
+
+    // // Ok
+    // // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2>;
+
+    // // Ok
+    // // flatMap<T2>(mapper: (val: T) => Result<T2, never>): Result<FlattenResults<T2>, never>;
+    // // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+    // // flatMap<T2>(mapper: (val: T) => Result<T2, E>): Result<FlattenResults<T2>, E>;
+    // // flatMap<T2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+    // flatMap<T2>(mapper: (val: T) => Ok<T2>): Result<FlattenResults<T2>, never>;
+    // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+
+    // These 2 need to be merged into 1 for ts to work
+    // flatMap<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<FlattenResults<T2>, E2>;
+    // flatMap<T2>(mapper: (val: T) => Result<T2, E>): Result<FlattenResults<T2>, E>;
+    // flatMap(mapper: (val: never) => Result<never, E>): Result<never, E>;
+
+    // flatMap<T2, E2>(
+    //     mapper: ((val: T) => Result<T2, E2>) | ((val: never) => Result<never, E>)
+    // ): Result<FlattenResults<T2>, E2> | Result<FlattenResults<T2>, E> | Result<never, E>;
 }
 
 // @ts-ignore
@@ -82,17 +108,16 @@ export declare function Err<E>(val: E): Err<E>;
 
 const isResultType = <T, E>(v: unknown): v is Result<T, E> => {
     return (
-      typeof v === 'object' &&
-      v !== null &&
-      'val' in v &&
-      'ok' in v &&
-      'map' in v &&
-      'mapErr' in v
+        typeof v === 'object' &&
+        v !== null &&
+        'val' in v &&
+        'ok' in v &&
+        'map' in v &&
+        'mapErr' in v
     );
 };
 
-
-const recursiveUnwrap = <T2, E>(r: Result<T2, E>): Result<T2, E> => {
+const recursiveUnwrap = <T2, E2>(r: Result<T2, E2>): Result<T2, E2> => {
     // If Error just return it
     if (!r.ok) {
         return r;
@@ -100,13 +125,13 @@ const recursiveUnwrap = <T2, E>(r: Result<T2, E>): Result<T2, E> => {
 
     const unwrapped = r.val;
 
-    // If not Result just return it with 1 layer of Result
+    // If not Result just wrap it return it
     if (!isResultType(unwrapped)) {
-        return new Ok(unwrapped) as Result<T2, E>;
+        return new Ok(unwrapped) as Result<T2, E2>;
     }
 
-    return recursiveUnwrap<T2, E>(unwrapped as Result<T2, E>);
-}
+    return recursiveUnwrap<T2, E2>(unwrapped as Result<T2, E2>);
+};
 
 /**
  * Contains the error value
@@ -170,7 +195,7 @@ export class Err<E> implements BaseResult<never, E> {
         return new Err(mapper(this.val));
     }
 
-    flatMap<T2>(mapper: (val: any) => Result<T2, E>): Result<FlattenResults<T2>, E> {
+    flatMap(mapper: (val: never) => Result<never, E>): Result<never, E> {
         return this;
     }
 }
@@ -195,11 +220,13 @@ export class Ok<T> implements BaseResult<T, never> {
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
         const obj = Object(this.val) as Iterable<any>;
 
-        return Symbol.iterator in obj ? obj[Symbol.iterator]() : {
-            next(): IteratorResult<never, never> {
-                return {done: true, value: undefined!};
-            }
-        };
+        return Symbol.iterator in obj
+            ? obj[Symbol.iterator]()
+            : {
+                  next(): IteratorResult<never, never> {
+                      return { done: true, value: undefined! };
+                  },
+              };
     }
 
     constructor(val: T) {
@@ -257,15 +284,17 @@ export class Ok<T> implements BaseResult<T, never> {
         return this.val;
     }
 
-    flatMap<T2, E>(mapper: (val: T) => Result<T2, E>): Result<FlattenResults<T2>, E> {
-        return recursiveUnwrap(mapper(this.val)) as Result<FlattenResults<T2>, E>;
+    flatMap<T2, E2>(mapper: (val: T) => Err<E2>): Err<E2>;
+    flatMap<T2>(mapper: (val: T) => Ok<T2>): Ok<FlattenResults<T2>>;
+    flatMap<T2, E2>(mapper: (val: T) => any): any {
+        return recursiveUnwrap(mapper(this.val));
     }
 }
 
 type FlattenResults<T> = {
     0: T;
     1: T extends BaseResult<infer U, any> ? FlattenResults<U> : never;
-  }[T extends BaseResult<any, any> ? 1 : 0];
+}[T extends BaseResult<any, any> ? 1 : 0];
 
 export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
 
@@ -285,7 +314,7 @@ export namespace Result {
      * Short circuits with the first `Err` found, if any
      */
     export function all<T extends Result<any, any>[]>(
-      ...results: T
+        ...results: T
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
         const okResult = [];
         for (let result of results) {
@@ -304,7 +333,7 @@ export namespace Result {
      * If no `Ok` is found, returns an `Err` containing the collected error values
      */
     export function any<T extends Result<any, any>[]>(
-      ...results: T
+        ...results: T
     ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>> {
         const errResult = [];
 
@@ -339,7 +368,9 @@ export namespace Result {
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
-            return op().then(val => new Ok(val)).catch(e => new Err(e));
+            return op()
+                .then((val) => new Ok(val))
+                .catch((e) => new Err(e));
         } catch (e) {
             return Promise.resolve(new Err(e));
         }
@@ -351,11 +382,9 @@ function toString(val: unknown): string {
     if (value === '[object Object]') {
         try {
             value = JSON.stringify(val);
-        } catch {
-        }
+        } catch {}
     }
     return value;
 }
 
 const x = Result.all(Ok(3) as Result<number, string>, Err(5) as Result<4, 5>);
-

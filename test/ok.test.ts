@@ -74,8 +74,7 @@ test('map', () => {
 test('andThen', () => {
     const ok = new Ok('Ok').andThen(() => new Ok(3));
     expect(ok).toMatchResult(Ok(3));
-
-    eq<typeof ok, Result<number, unknown>>(true);
+    eq<typeof ok, Result<number, never>>(true);
 
     const err = new Ok('Ok').andThen(() => new Err(false));
     expect(err).toMatchResult(Err(false));
@@ -90,8 +89,8 @@ test('mapErr', () => {
 
 test('iterable', () => {
     let i = 0;
-    for (const char of Ok('hello')) {
-        expect('hello'[i]).toBe(char);
+    for (const char of Ok("hello")) {
+        expect("hello"[i]).toBe(char);
         expect_string(char, true);
         i++;
     }
@@ -106,7 +105,9 @@ test('iterable', () => {
     for (const item of Ok(1)) {
         expect_never(item, true);
 
-        throw new Error('Unreachable, Err@@iterator should emit no value and return');
+        throw new Error(
+          'Unreachable, Err@@iterator should emit no value and return'
+        );
     }
 });
 
@@ -132,8 +133,6 @@ test('flatMap unwraps deeply nested Ok Results and multiple FlatMaps', () => {
     r.map((v) => v * 2)
         .flatMap(() => new Ok(new Ok(new Ok('DeeplyNestedValue'))))
         .map((v) => expect(v).toBe('DeeplyNestedValue'))
-        .flatMap(() => new Ok(2))
-        .map((v) => expect(v).toBe(2))
         .flatMap(() => new Ok('Deeply nested and multiple fmaps'))
         .flatMap((v) => new Ok(new Ok(new Ok(v))))
         .map((v) => expect(v).toBe('Deeply nested and multiple fmaps'));
@@ -146,4 +145,3 @@ test('flatMap unwraps multiple nested OkResults until it reaches an error', () =
         .flatMap(() => new Ok(new Ok(new Err('SimpleError'))))
         .mapErr((s) => expect(s).toBe('SimpleError'));
 });
-

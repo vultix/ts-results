@@ -204,4 +204,4 @@ test('safeUnwrap', () => {
         // @ts-expect-error
         result.safeUnwrap();
     }
-})
+});
