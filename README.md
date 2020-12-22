@@ -187,7 +187,7 @@ let url1: Result<string, Error1> = attempt1();
 let url2: Result<string, Error2> = attempt2();
 let url3: Result<string, Error3> = attempt3();
 
-let result = Result.all(url1, url2, url3); // Result<string, Error1 | Error2 | Error3>
+let result = Result.any(url1, url2, url3); // Result<string, Error1 | Error2 | Error3>
 
 let url = result.unwrap(); // At least one attempt gave us a successful url
 ``` 
