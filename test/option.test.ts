@@ -55,7 +55,9 @@ test("type narrowing", () => {
 test("unwrap", () => {
     expect(() => someString.unwrap()).not.toThrow();
     expect(someString.unwrap()).toBe("foo");
+    expect(someString.expect('msg')).toBe("foo");
     expect(someString.unwrapOr("bar")).toBe("foo");
+    expect(someString.safeUnwrap()).toBe("foo");
     expect(() => None.unwrap()).toThrow(/Tried to unwrap None/);
     expect(() => None.expect("foobar")).toThrow(/foobar/);
     expect(None.unwrapOr("honk")).toBe("honk");
@@ -74,14 +76,20 @@ test("map / andThen", () => {
 });
 
 test("all / any", () => {
-    const strings = ["foo", "bar", "baz"];
-    const options = strings.map(Some);
+    const strings = ["foo", "bar", "baz"] as const;
+    const options = [Some("foo" as const), Some("bar" as const), Some("baz" as const)] as const;
+
+    const all = Option.all(...options);
+    eq<typeof all, Option<['foo', 'bar', 'baz']>>(true);
+
+    expect(Option.all(...options)).toEqual(Some(strings));
+    expect(Option.all()).toEqual(Some([]));
+    expect(Option.all(...options, None)).toEqual(None);
 
     expect(Option.any(...options)).toEqual(Some("foo"));
-    expect(Option.all(...options)).toEqual(Some(strings));
-
     expect(Option.any(...options, None)).toEqual(Some("foo"));
-    expect(Option.all(...options, None)).toEqual(None);
+    expect(Option.any(None, None)).toEqual(None);
+    expect(Option.any()).toEqual(None);
 });
 
 test("Type Helpers", () => {
