@@ -1,4 +1,4 @@
-import {None, Option, OptionSomeType, Some} from "../src/option";
+import {None, Option, OptionSomeType, Some} from "../src";
 import {eq} from './util';
 
 const someString = Some("foo");
