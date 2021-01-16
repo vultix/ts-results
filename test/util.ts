@@ -32,9 +32,8 @@ expect.extend({
         const expectedVal = JSON.stringify(result.val);
 
         return {
-            message: () =>
-              `expected ${type}(${val}) ${pass ? '' : 'not '}to equal ${expectedType}(${expectedVal})`,
-            pass
+            message: () => `expected ${type}(${val}) ${pass ? '' : 'not '}to equal ${expectedType}(${expectedVal})`,
+            pass,
         };
     },
-})
+});

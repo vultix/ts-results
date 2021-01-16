@@ -83,8 +83,8 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
             next(): IteratorResult<never, never> {
-                return {done: true, value: undefined!};
-            }
+                return { done: true, value: undefined! };
+            },
         };
     }
 
@@ -132,7 +132,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 }
 
 // This allows Err to be callable - possible because of the es5 compilation target
-export const Err = ErrImpl as typeof ErrImpl & (<E> (err: E) => ErrImpl<E>);
+export const Err = ErrImpl as typeof ErrImpl & (<E>(err: E) => ErrImpl<E>);
 export type Err<E> = ErrImpl<E>;
 
 /**
@@ -151,11 +151,13 @@ export class OkImpl<T> implements BaseResult<T, never> {
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
         const obj = Object(this.val) as Iterable<any>;
 
-        return Symbol.iterator in obj ? obj[Symbol.iterator]() : {
-            next(): IteratorResult<never, never> {
-                return {done: true, value: undefined!};
-            }
-        };
+        return Symbol.iterator in obj
+            ? obj[Symbol.iterator]()
+            : {
+                  next(): IteratorResult<never, never> {
+                      return { done: true, value: undefined! };
+                  },
+              };
     }
 
     constructor(val: T) {
@@ -215,9 +217,8 @@ export class OkImpl<T> implements BaseResult<T, never> {
 }
 
 // This allows Ok to be callable - possible because of the es5 compilation target
-export const Ok = OkImpl as typeof OkImpl & (<T> (val: T) => OkImpl<T>);
+export const Ok = OkImpl as typeof OkImpl & (<T>(val: T) => OkImpl<T>);
 export type Ok<T> = OkImpl<T>;
-
 
 export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
 
@@ -291,7 +292,9 @@ export namespace Result {
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
-            return op().then(val => new Ok(val)).catch(e => new Err(e));
+            return op()
+                .then((val) => new Ok(val))
+                .catch((e) => new Err(e));
         } catch (e) {
             return Promise.resolve(new Err(e));
         }
@@ -307,8 +310,7 @@ function toString(val: unknown): string {
     if (value === '[object Object]') {
         try {
             value = JSON.stringify(val);
-        } catch {
-        }
+        } catch {}
     }
     return value;
 }

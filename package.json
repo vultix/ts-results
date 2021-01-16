@@ -17,6 +17,7 @@
     "conditional-type-checks": "^1.0.5",
     "copyfiles": "^2.3.0",
     "jest": "^26.1.0",
+    "prettier": "^2.2.1",
     "rxjs": "^6.5.5",
     "ts-jest": "^26.1.1",
     "typescript": "^3.9.3"

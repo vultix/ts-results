@@ -22,7 +22,7 @@ test('Constructable & Callable', () => {
 
     // @ts-expect-error Err<string> is not assignable to Err<number>
     mapper<Err<number>>(Err);
-})
+});
 
 test('ok, err, and val', () => {
     const err = new Err(32);
@@ -40,7 +40,7 @@ test('static EMPTY', () => {
     expect(Err.EMPTY).toBeInstanceOf(Err);
     expect(Err.EMPTY.val).toBe(undefined);
     eq<typeof Err.EMPTY, Err<void>>(true);
-})
+});
 
 test('else, unwrapOr', () => {
     const e1 = Err(3).else(false);
@@ -54,21 +54,21 @@ test('else, unwrapOr', () => {
 
 test('expect', () => {
     expect(() => {
-        const err = Err(true).expect("should fail!");
+        const err = Err(true).expect('should fail!');
         expect_never(err, true);
     }).toThrowError('should fail!');
 });
 
 test('unwrap', () => {
     expect(() => {
-        const err = Err({message: 'bad error'}).unwrap();
+        const err = Err({ message: 'bad error' }).unwrap();
         expect_never(err, true);
     }).toThrowError('{"message":"bad error"}');
 });
 
 test('map', () => {
     const err = Err(3).map((x) => Symbol());
-    expect(err).toMatchResult(Err(3))
+    expect(err).toMatchResult(Err(3));
     eq<typeof err, Err<number>>(true);
 });
 
@@ -79,16 +79,14 @@ test('andThen', () => {
 });
 
 test('mapErr', () => {
-    const err = Err("32").mapErr((x) => +x);
+    const err = Err('32').mapErr((x) => +x);
     expect(err).toMatchResult(Err(32));
     eq<typeof err, Err<number>>(true);
-})
+});
 
 test('iterable', () => {
     for (const item of Err([123])) {
         expect_never(item, true);
-        throw new Error(
-          "Unreachable, Err@@iterator should emit no value and return"
-        );
+        throw new Error('Unreachable, Err@@iterator should emit no value and return');
     }
 });

@@ -5,7 +5,12 @@
   "main": "index.js",
   "module": "./esm/index.js",
   "types": "index.d.ts",
-  "keywords": ["typescript", "rust", "errors", "result"],
+  "keywords": [
+    "typescript",
+    "rust",
+    "errors",
+    "result"
+  ],
   "author": "Aidan Grant",
   "license": "MIT",
   "repository": {

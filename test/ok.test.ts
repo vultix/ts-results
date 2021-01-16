@@ -89,8 +89,8 @@ test('mapErr', () => {
 
 test('iterable', () => {
     let i = 0;
-    for (const char of Ok("hello")) {
-        expect("hello"[i]).toBe(char);
+    for (const char of Ok('hello')) {
+        expect('hello'[i]).toBe(char);
         expect_string(char, true);
         i++;
     }
@@ -105,8 +105,6 @@ test('iterable', () => {
     for (const item of Ok(1)) {
         expect_never(item, true);
 
-        throw new Error(
-          'Unreachable, Err@@iterator should emit no value and return'
-        );
+        throw new Error('Unreachable, Err@@iterator should emit no value and return');
     }
 });
