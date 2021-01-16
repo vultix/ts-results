@@ -1,10 +1,14 @@
-import { Err, Ok, Result, ResultErrType, ResultErrTypes, ResultOkType, ResultOkTypes } from '../src';
+import {Err, Ok, Result, ResultErrType, ResultErrTypes, ResultOkType, ResultOkTypes, Some} from '../src';
 import { eq } from './util';
 
 test('Err<E> | Ok<T> should be Result<T, E>', () => {
     const r1 = Err(0);
     const r2 = new Ok('');
     const r = Math.random() ? r1 : r2;
+
+    expect(Result.isResult(r1)).toEqual(true);
+    expect(Result.isResult(r2)).toEqual(true);
+    expect(Result.isResult(Some(3))).toEqual(false);
     eq<typeof r, Result<string, number>>(true);
 });
 

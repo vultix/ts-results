@@ -74,8 +74,8 @@ export function resultSwitchMap<T, E, T2, E2>(mapper: (val: T) => ObservableInpu
                   return of(result);
               }
           }),
-          map(result => {
-              if (result instanceof Ok || result instanceof Err) {
+          map((result: T2 | Result<T2, E | E2>) => {
+              if (Result.isResult(result)) {
                   return result;
               } else {
                   return new Ok(result);
@@ -97,8 +97,8 @@ export function resultMergeMap<T, E, T2, E2>(mapper: (val: T) => ObservableInput
                   return of(result);
               }
           }),
-          map(result => {
-              if (result instanceof Ok || result instanceof Err) {
+          map((result: T2 | Result<T2, E | E2>) => {
+              if (Result.isResult(result)) {
                   return result;
               } else {
                   return new Ok(result);

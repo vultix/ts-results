@@ -296,6 +296,10 @@ export namespace Result {
             return Promise.resolve(new Err(e));
         }
     }
+
+    export function isResult<T = any, E = any>(val: unknown): val is Result<T, E> {
+        return val instanceof Err || val instanceof Ok;
+    }
 }
 
 function toString(val: unknown): string {
