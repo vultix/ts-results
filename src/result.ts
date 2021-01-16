@@ -237,7 +237,7 @@ export namespace Result {
      * Short circuits with the first `Err` found, if any
      */
     export function all<T extends Result<any, any>[]>(
-      ...results: T
+        ...results: T
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
         const okResult = [];
         for (let result of results) {
@@ -256,7 +256,7 @@ export namespace Result {
      * If no `Ok` is found, returns an `Err` containing the collected error values
      */
     export function any<T extends Result<any, any>[]>(
-      ...results: T
+        ...results: T
     ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>> {
         const errResult = [];
 
