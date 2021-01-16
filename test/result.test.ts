@@ -2,14 +2,14 @@ import { Err, Ok, Result, ResultErrType, ResultErrTypes, ResultOkType, ResultOkT
 import { eq } from './util';
 
 test('Err<E> | Ok<T> should be Result<T, E>', () => {
-    const r1 = new Err(0);
+    const r1 = Err(0);
     const r2 = new Ok('');
     const r = Math.random() ? r1 : r2;
     eq<typeof r, Result<string, number>>(true);
 });
 
 test('Type can be narrowed using ok & err', () => {
-    const r1 = new Ok(0) as Result<number, string>;
+    const r1 = Ok(0) as Result<number, string>;
     if (r1.ok) {
         eq<Ok<number>, typeof r1>(true);
     } else {
@@ -80,10 +80,10 @@ test('ResultOkTypes & ResultErrTypes', () => {
 });
 
 test('Result.all', () => {
-    const ok0 = new Ok(3);
+    const ok0 = Ok(3);
     const ok1 = new Ok(true);
     const ok2 = new Ok(8 as const) as Result<8, boolean>;
-    const err0 = new Err(Symbol());
+    const err0 = Err(Symbol());
     const err1 = new Err(Error());
     const err2 = new Err(9 as const) as Result<boolean, 9>;
 

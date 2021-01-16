@@ -1,82 +1,91 @@
-import {
-    Option,
-    Some,
-    None,
-    some,
-    none,
-    isOption,
-    anyOption,
-    allOptions,
-} from "../src/option";
+import {None, Option, OptionSomeType, Some} from "../src/option";
+import {eq} from './util';
 
-const someString = some("foo");
-const someNum = some(10);
+const someString = Some("foo");
+const someNum = new Some(10);
 
 test("basic invariants", () => {
     expect(someString.some).toBeTruthy();
     expect(someNum.some).toBeTruthy();
-    expect(none).toBe(none);
+    expect(None).toBe(None);
     expect(someString.val).toBe("foo");
     expect(someNum.val).toBe(10);
 
-    expect(isOption(someString)).toBe(true);
-    expect(isOption(someNum)).toBe(true);
-    expect(isOption(none)).toBe(true);
-    expect(isOption("foo")).toBe(false);
+
+    expect(Option.isOption(someString)).toBe(true);
+    expect(Option.isOption(someNum)).toBe(true);
+    expect(Option.isOption(None)).toBe(true);
+    expect(Option.isOption("foo")).toBe(false);
 });
 
-function funcTakesString(s: string) {}
-
 test("type narrowing", () => {
-    const opt = none as Option<string>;
+    const opt = None as Option<string>;
     if (opt.some) {
-        funcTakesString(opt.val);
+        eq<typeof opt, Some<string>>(true);
+        eq<typeof opt.val, string>(true);
     } else {
-        // @ts-expect-error
-        funcTakesString(opt.val);
+        eq<typeof opt, None>(true);
     }
 
-    const opt2 = none as Option<number>;
-    if (opt2.some) {
-        // @ts-expect-error
-        funcTakesString(opt2.val);
+    if (!opt.some) {
+        eq<typeof opt, None>(true);
     } else {
-        // @ts-expect-error
-        funcTakesString(opt2.val);
+        eq<typeof opt, Some<string>>(true);
+        eq<typeof opt.val, string>(true);
+    }
+
+    if (opt.none) {
+        eq<typeof opt, None>(true);
+    } else {
+        eq<typeof opt, Some<string>>(true);
+        eq<typeof opt.val, string>(true);
+    }
+
+    if (!opt.none) {
+        eq<typeof opt, Some<string>>(true);
+        eq<typeof opt.val, string>(true);
+    } else {
+        eq<typeof opt, None>(true);
     }
 
     expect(someString).toBeInstanceOf(Some);
-    expect(none).toBeInstanceOf(None);
+    expect(None).toEqual(None);
 });
 
 test("unwrap", () => {
     expect(() => someString.unwrap()).not.toThrow();
     expect(someString.unwrap()).toBe("foo");
     expect(someString.unwrapOr("bar")).toBe("foo");
-    expect(() => none.unwrap()).toThrow(/Tried to unwrap None/);
-    expect(() => none.expect("foobar")).toThrow(/foobar/);
-    expect(none.unwrapOr("honk")).toBe("honk");
+    expect(() => None.unwrap()).toThrow(/Tried to unwrap None/);
+    expect(() => None.expect("foobar")).toThrow(/foobar/);
+    expect(None.unwrapOr("honk")).toBe("honk");
 });
 
 test("map / andThen", () => {
-    expect(none.map(() => 1)).toBe(none);
+    expect(None.map(() => 1)).toBe(None);
     // @ts-expect-error
-    expect(none.andThen(() => 1)).toBe(none);
-    expect(none.andThen(() => some(1))).toBe(none);
+    expect(None.andThen(() => 1)).toBe(None);
+    expect(None.andThen(() => Some(1))).toBe(None);
 
-    expect(someString.map(() => 1)).toEqual(some(1));
+    expect(someString.map(() => 1)).toEqual(Some(1));
     // @ts-expect-error
     someString.andThen(() => 1);
-    expect(someString.andThen(() => some(1))).toEqual(some(1));
+    expect(someString.andThen(() => Some(1))).toEqual(Some(1));
 });
 
 test("all / any", () => {
     const strings = ["foo", "bar", "baz"];
-    const options = strings.map(some);
+    const options = strings.map(Some);
 
-    expect(anyOption(...options)).toEqual(some("foo"));
-    expect(allOptions(...options)).toEqual(some(strings));
+    expect(Option.any(...options)).toEqual(Some("foo"));
+    expect(Option.all(...options)).toEqual(Some(strings));
 
-    expect(anyOption(...options, none)).toEqual(some("foo"));
-    expect(allOptions(...options, none)).toEqual(none);
+    expect(Option.any(...options, None)).toEqual(Some("foo"));
+    expect(Option.all(...options, None)).toEqual(None);
 });
+
+test("Type Helpers", () => {
+    eq<OptionSomeType<Option<string>>, string>(true);
+    eq<OptionSomeType<Some<string>>, string>(true);
+    eq<OptionSomeType<None>, never>(true)
+})

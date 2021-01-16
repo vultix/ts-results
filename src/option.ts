@@ -40,19 +40,12 @@ interface BaseOption<T>
     map<U>(mapper: (val: T) => U): Option<U>;
 }
 
-const SENTINEL = Symbol();
-
 /**
  * Contains the None value
  */
-// @ts-ignore
-export class None implements BaseOption<never> {
-    /** An empty None */
-    // @ts-ignore
-    static readonly EMPTY = new None(SENTINEL);
-
-    readonly some!: false;
-    readonly none!: true;
+class NoneImpl implements BaseOption<never> {
+    readonly some = false;
+    readonly none = true;
 
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
@@ -60,17 +53,6 @@ export class None implements BaseOption<never> {
                 return { done: true, value: undefined! };
             },
         };
-    }
-
-    constructor() {
-        if (arguments[0] !== SENTINEL) {
-            throw new Error(
-                "Option objects should not be constructed with new"
-            );
-        }
-
-        this.some = false;
-        this.none = true;
     }
 
     unwrapOr<T2>(val: T2): T2 {
@@ -94,19 +76,17 @@ export class None implements BaseOption<never> {
     }
 }
 
-export const none = None.EMPTY;
-export function some<T>(value: T): Some<T> {
-    // @ts-ignore
-    return new Some(value, SENTINEL);
-}
+// Export None as a singleton, then freeze it so it can't be modified
+export const None = new NoneImpl();
+export type None = NoneImpl;
+Object.freeze(None);
+
 
 /**
  * Contains the success value
  */
-// @ts-ignore
-export class Some<T> implements BaseOption<T> {
-    // @ts-ignore
-    static readonly EMPTY = new Some<void>(undefined, SENTINEL);
+class SomeImpl<T> implements BaseOption<T> {
+    static readonly EMPTY = new SomeImpl<void>(undefined);
 
     readonly some!: true;
     readonly none!: false;
@@ -128,10 +108,8 @@ export class Some<T> implements BaseOption<T> {
     }
 
     constructor(val: T) {
-        if (arguments[1] !== SENTINEL) {
-            throw new Error(
-                "Option objects should not be constructed with new"
-            );
+        if (!(this instanceof SomeImpl)) {
+            return new SomeImpl(val);
         }
 
         this.some = true;
@@ -152,8 +130,7 @@ export class Some<T> implements BaseOption<T> {
     }
 
     map<T2>(mapper: (val: T) => T2): Some<T2> {
-        // @ts-ignore
-        return new Some(mapper(this.val), SENTINEL);
+        return Some(mapper(this.val));
     }
 
     andThen<T2>(mapper: (val: T) => Option<T2>): Option<T2> {
@@ -174,6 +151,10 @@ export class Some<T> implements BaseOption<T> {
     }
 }
 
+// This allows Some to be callable - possible because of the es5 compilation target
+export const Some = SomeImpl as typeof SomeImpl & (<T> (val: T) => SomeImpl<T>);
+export type Some<T> = SomeImpl<T>;
+
 export type Option<T> = (Some<T> | None) & BaseOption<T>;
 
 export type OptionSomeType<T extends Option<any>> = T extends Option<infer U>
@@ -184,45 +165,47 @@ export type OptionSomeTypes<T extends Option<any>[]> = {
     [key in keyof T]: T[key] extends Option<infer U> ? U : never;
 };
 
-/**
- * Parse a set of `Option`s, returning an array of all `Some` values.
- * Short circuits with the first `None` found, if any
- */
-export function allOptions<T extends Option<any>[]>(
-    ...options: T
-): Option<OptionSomeTypes<T>> {
-    const someOption = [];
-    for (let option of options) {
-        if (option.some) {
-            someOption.push(option.val);
-        } else {
-            return option as None;
+export namespace Option {
+    /**
+     * Parse a set of `Option`s, returning an array of all `Some` values.
+     * Short circuits with the first `None` found, if any
+     */
+    export function all<T extends Option<any>[]>(
+        ...options: T
+    ): Option<OptionSomeTypes<T>> {
+        const someOption = [];
+        for (let option of options) {
+            if (option.some) {
+                someOption.push(option.val);
+            } else {
+                return option as None;
+            }
         }
+
+        return Some(someOption as OptionSomeTypes<T>);
     }
 
-    return some(someOption as OptionSomeTypes<T>);
-}
-
-/**
- * Parse a set of `Option`s, short-circuits when an input value is `Some`.
- * If no `Some` is found, returns `None`.
- */
-export function anyOption<T extends Option<any>[]>(
-    ...options: T
-): Option<OptionSomeTypes<T>[number]> {
-    // short-circuits
-    for (const option of options) {
-        if (option.some) {
-            return option as Some<OptionSomeTypes<T>[number]>;
-        } else {
-            return option as None;
+    /**
+     * Parse a set of `Option`s, short-circuits when an input value is `Some`.
+     * If no `Some` is found, returns `None`.
+     */
+    export function any<T extends Option<any>[]>(
+        ...options: T
+    ): Option<OptionSomeTypes<T>[number]> {
+        // short-circuits
+        for (const option of options) {
+            if (option.some) {
+                return option as Some<OptionSomeTypes<T>[number]>;
+            } else {
+                return option as None;
+            }
         }
+
+        // it must be None
+        return None;
     }
 
-    // it must be None
-    return none;
-}
-
-export function isOption<T = any>(value: any): value is Option<T> {
-    return value instanceof Some || value instanceof None;
+    export function isOption<T = any>(value: unknown): value is Option<T> {
+        return value instanceof Some || value === None;
+    }
 }

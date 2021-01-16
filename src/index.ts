@@ -69,16 +69,12 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
 }
 
-// @ts-ignore
-export declare function Err<E>(val: E): Err<E>;
-
 /**
  * Contains the error value
  */
-// @ts-ignore
-export class Err<E> implements BaseResult<never, E> {
+export class ErrImpl<E> implements BaseResult<never, E> {
     /** An empty Err */
-    static readonly EMPTY = new Err<void>(undefined);
+    static readonly EMPTY = new ErrImpl<void>(undefined);
 
     readonly ok!: false;
     readonly err!: true;
@@ -93,8 +89,8 @@ export class Err<E> implements BaseResult<never, E> {
     }
 
     constructor(val: E) {
-        if (!(this instanceof Err)) {
-            return new Err(val);
+        if (!(this instanceof ErrImpl)) {
+            return new ErrImpl(val);
         }
 
         this.ok = false;
@@ -135,15 +131,15 @@ export class Err<E> implements BaseResult<never, E> {
     }
 }
 
-// @ts-ignore
-export declare function Ok<T>(val: T): Ok<T>;
+// This allows Err to be callable - possible because of the es5 compilation target
+export const Err = ErrImpl as typeof ErrImpl & (<E> (err: E) => ErrImpl<E>);
+export type Err<E> = ErrImpl<E>;
 
 /**
  * Contains the success value
  */
-// @ts-ignore
-export class Ok<T> implements BaseResult<T, never> {
-    static readonly EMPTY = new Ok<void>(undefined);
+export class OkImpl<T> implements BaseResult<T, never> {
+    static readonly EMPTY = new OkImpl<void>(undefined);
 
     readonly ok!: true;
     readonly err!: false;
@@ -163,8 +159,8 @@ export class Ok<T> implements BaseResult<T, never> {
     }
 
     constructor(val: T) {
-        if (!(this instanceof Ok)) {
-            return new Ok(val);
+        if (!(this instanceof OkImpl)) {
+            return new OkImpl(val);
         }
 
         this.ok = true;
@@ -217,6 +213,10 @@ export class Ok<T> implements BaseResult<T, never> {
         return this.val;
     }
 }
+
+// This allows Ok to be callable - possible because of the es5 compilation target
+export const Ok = OkImpl as typeof OkImpl & (<T> (val: T) => OkImpl<T>);
+export type Ok<T> = OkImpl<T>;
 
 
 export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
@@ -308,5 +308,3 @@ function toString(val: unknown): string {
     }
     return value;
 }
-
-const x = Result.all(Ok(3) as Result<number, string>, Err(5) as Result<4, 5>);
