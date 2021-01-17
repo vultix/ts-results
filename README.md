@@ -7,32 +7,32 @@ Brings compile-time error checking and optional values to typescript.
 
 ## Contents
 
-- [Installation](#installation)
-- [Example](#example)
-    - [Result Example](#result-example)
-    - [Option Example](#option-example)
-- [Usage](#usage)
-    - [Creation](#creation)
-    - [Type Safety](#type-safety)
-    - [Unwrap](#unwrap)
-    - [Expect](#expect)
-    - [Map, MapErr](#map-and-maperr)
-    - [Else](#else)
-    - [UnwrapOr](#unwrapor)
-    - [Empty](#empty)
-    - [Combining Results](#combining-results)
-        - [Result.all](#result-all)
-        - [Result.any](#result-any)
-- [Usage with rxjs](#usage-with-rxjs)
-    - [resultMap](#resultmap)
-    - [resultMapErr](#resultmaperr)
-    - [resultMapTo](#resultmapto)
-    - [resultMapErrTo](#resultmapto)
-    - [elseMap](#elsemap)
-    - [elseMapTo](#elsemapto)
-    - [resultSwitchMap, resultMergeMap](#resultswitchmap-and-resultmergemap)
-    - [filterResultOk](#filterresultok)
-    - [filterResultErr](#filterresulterr)
+-   [Installation](#installation)
+-   [Example](#example)
+    -   [Result Example](#result-example)
+    -   [Option Example](#option-example)
+-   [Usage](#usage)
+    -   [Creation](#creation)
+    -   [Type Safety](#type-safety)
+    -   [Unwrap](#unwrap)
+    -   [Expect](#expect)
+    -   [Map, MapErr](#map-and-maperr)
+    -   [Else](#else)
+    -   [UnwrapOr](#unwrapor)
+    -   [Empty](#empty)
+    -   [Combining Results](#combining-results)
+        -   [Result.all](#result-all)
+        -   [Result.any](#result-any)
+-   [Usage with rxjs](#usage-with-rxjs)
+    -   [resultMap](#resultmap)
+    -   [resultMapErr](#resultmaperr)
+    -   [resultMapTo](#resultmapto)
+    -   [resultMapErrTo](#resultmapto)
+    -   [elseMap](#elsemap)
+    -   [elseMapTo](#elsemapto)
+    -   [resultSwitchMap, resultMergeMap](#resultswitchmap-and-resultmergemap)
+    -   [filterResultOk](#filterresultok)
+    -   [filterResultErr](#filterresulterr)
 
 ## Installation
 
@@ -53,7 +53,7 @@ $ yarn add ts-results
 Convert this:
 
 ```typescript
-import {existsSync, readFileSync} from 'fs';
+import { existsSync, readFileSync } from 'fs';
 
 function readFile(path: string): string {
     if (existsSync(path)) {
@@ -71,8 +71,8 @@ const text = readFile('test.txt');
 To this:
 
 ```typescript
-import {existsSync, readFileSync} from 'fs';
-import {Ok, Err, Result} from 'ts-results';
+import { existsSync, readFileSync } from 'fs';
+import { Ok, Err, Result } from 'ts-results';
 
 function readFile(path: string): Result<string, 'invalid path'> {
     if (existsSync(path)) {
@@ -119,7 +119,7 @@ console.log(optionalUrl);
 To this:
 
 ```typescript
-import {Option, Some, None} from 'ts-results';
+import { Option, Some, None } from 'ts-results';
 
 declare function getLoggedInUsername(): Option<string>;
 
@@ -129,7 +129,7 @@ function getLoggedInImage(): Option<string> {
     return getLoggedInUsername().andThen(getImageForUsername);
 }
 
-const optionalUrl = getLoggedInImage().map(url => new URL(stringUrl));
+const optionalUrl = getLoggedInImage().map((url) => new URL(stringUrl));
 console.log(optionalUrl); // Some(URL('...'))
 
 // To extract the value, do this:
@@ -141,7 +141,7 @@ if (optionalUrl.some) {
 ## Usage
 
 ```typescript
-import {Result, Err, Ok} from 'ts-results';
+import { Result, Err, Ok } from 'ts-results';
 ```
 
 #### Creation
@@ -279,9 +279,9 @@ Allows you to do the same actions as the normal [rxjs map](http://reactivex.io/d
 operator on a stream of Result objects.
 
 ```typescript
-import {of, Observable} from 'rxjs';
-import {Ok, Err, Result} from 'ts-results';
-import {resultMap} from 'ts-results/rxjs-operators';
+import { of, Observable } from 'rxjs';
+import { Ok, Err, Result } from 'ts-results';
+import { resultMap } from 'ts-results/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(Ok(5), Err('uh oh'));
 
@@ -305,7 +305,7 @@ greaterThanZero.subscribe((result) => {
 #### resultMapErr
 
 ```typescript
-import {resultMapErr} from 'ts-results/rxjs-operators';
+import { resultMapErr } from 'ts-results/rxjs-operators';
 ```
 
 Behaves exactly the same as [resultMap](#resultmap), but maps the error value.
@@ -313,7 +313,7 @@ Behaves exactly the same as [resultMap](#resultmap), but maps the error value.
 #### resultMapTo
 
 ```typescript
-import {resultMapTo} from 'ts-results/rxjs-operators';
+import { resultMapTo } from 'ts-results/rxjs-operators';
 ```
 
 Behaves the same as [resultMap](#resultmap), but takes a value instead of a function.
@@ -321,7 +321,7 @@ Behaves the same as [resultMap](#resultmap), but takes a value instead of a func
 #### resultMapErrTo
 
 ```typescript
-import {resultMapErrTo} from 'ts-results/rxjs-operators';
+import { resultMapErrTo } from 'ts-results/rxjs-operators';
 ```
 
 Behaves the same as [resultMapErr](#resultmaperr), but takes a value instead of a function.
@@ -333,9 +333,9 @@ Allows you to turn a stream of Result objects into a stream of values, transform
 Similar to calling the [else](#else) function, but works on a stream of Result objects.
 
 ```typescript
-import {of, Observable} from 'rxjs';
-import {Ok, Err, Result} from 'ts-results';
-import {elseMap} from 'ts-results/rxjs-operators';
+import { of, Observable } from 'rxjs';
+import { Ok, Err, Result } from 'ts-results';
+import { elseMap } from 'ts-results/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(Ok(5), Err(new Error('uh oh')));
 
@@ -360,7 +360,7 @@ doubled.subscribe((number) => {
 #### elseMapTo
 
 ```typescript
-import {elseMapTo} from 'ts-results/rxjs-operators';
+import { elseMapTo } from 'ts-results/rxjs-operators';
 ```
 
 Behaves the same as [elseMap](#elsemap), but takes a value instead of a function.
@@ -379,9 +379,9 @@ Merging or switching from a stream of `Result<T, E>` objects onto a stream of `R
 into a stream of `Result<T2, E | T2>` objects.
 
 ```typescript
-import {of, Observable} from 'rxjs';
-import {Ok, Err, Result} from 'ts-results';
-import {resultMergeMap} from 'ts-results/rxjs-operators';
+import { of, Observable } from 'rxjs';
+import { Ok, Err, Result } from 'ts-results';
+import { resultMergeMap } from 'ts-results/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
@@ -415,9 +415,9 @@ test$.subscribe((result) => {
 Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the Errs and mapping to the Ok values.
 
 ```typescript
-import {of, Observable} from 'rxjs';
-import {Ok, Err, Result} from 'ts-results';
-import {filterResultOk} from 'ts-results/rxjs-operators';
+import { of, Observable } from 'rxjs';
+import { Ok, Err, Result } from 'ts-results';
+import { filterResultOk } from 'ts-results/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
@@ -436,9 +436,9 @@ test$.subscribe((result) => {
 Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the Oks and mapping to the error values.
 
 ```typescript
-import {of, Observable} from 'rxjs';
-import {Ok, Err, Result} from 'ts-results';
-import {filterResultOk} from 'ts-results/rxjs-operators';
+import { of, Observable } from 'rxjs';
+import { Ok, Err, Result } from 'ts-results';
+import { filterResultOk } from 'ts-results/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
