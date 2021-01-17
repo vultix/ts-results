@@ -1,5 +1,5 @@
-import { ObservableInput, of, OperatorFunction } from 'rxjs';
-import { filter, map, mergeMap, switchMap } from 'rxjs/operators';
+import { MonoTypeOperatorFunction, Observable, ObservableInput, of, OperatorFunction } from 'rxjs';
+import { filter, map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import { Err, Ok, Result } from '../index';
 
 export function resultMap<T, T2, E>(mapper: (val: T) => T2): OperatorFunction<Result<T, E>, Result<T2, E>> {
@@ -112,7 +112,7 @@ export function resultMergeMap<T, E, T2, E2>(
     };
 }
 
-export function filterResultOk<T>(): OperatorFunction<Result<T, unknown>, T> {
+export function filterResultOk<T, E>(): OperatorFunction<Result<T, E>, T> {
     return (source) => {
         return source.pipe(
             filter((result): result is Ok<T> => result.ok),
@@ -121,11 +121,35 @@ export function filterResultOk<T>(): OperatorFunction<Result<T, unknown>, T> {
     };
 }
 
-export function filterResultErr<E>(): OperatorFunction<Result<unknown, E>, E> {
+export function filterResultErr<T, E>(): OperatorFunction<Result<T, E>, E> {
     return (source) => {
         return source.pipe(
             filter((result): result is Err<E> => result.err),
             map((result) => result.val),
+        );
+    };
+}
+
+export function tapResultErr<T, E>(tapFn: (err: E) => void): MonoTypeOperatorFunction<Result<T, E>> {
+    return (source: Observable<Result<T, E>>) => {
+        return source.pipe(
+            tap((r) => {
+                if (!r.ok) {
+                    tapFn(r.val);
+                }
+            }),
+        );
+    };
+}
+
+export function tapResultOk<T, E>(tapFn: (val: T) => void): MonoTypeOperatorFunction<Result<T, E>> {
+    return (source: Observable<Result<T, E>>) => {
+        return source.pipe(
+            tap((r) => {
+                if (r.ok) {
+                    tapFn(r.val);
+                }
+            }),
         );
     };
 }
