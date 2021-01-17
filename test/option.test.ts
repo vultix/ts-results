@@ -96,3 +96,9 @@ test('Type Helpers', () => {
     eq<OptionSomeType<Some<string>>, string>(true);
     eq<OptionSomeType<None>, never>(true);
 });
+
+test('to string', () => {
+    expect(`${Some(1)}`).toEqual('Some(1)');
+    expect(`${Some({ name: 'George' })}`).toEqual('Some({"name":"George"})');
+    expect(`${None}`).toEqual('None');
+});

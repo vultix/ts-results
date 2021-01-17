@@ -90,3 +90,8 @@ test('iterable', () => {
         throw new Error('Unreachable, Err@@iterator should emit no value and return');
     }
 });
+
+test('to string', () => {
+    expect(`${Err(1)}`).toEqual('Err(1)');
+    expect(`${Err({ name: 'George' })}`).toEqual('Err({"name":"George"})');
+});

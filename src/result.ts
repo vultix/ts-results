@@ -1,3 +1,5 @@
+import { toString } from './utils';
+
 /*
  * Missing Rust Result type methods:
  * pub fn contains<U>(&self, x: &U) -> bool
@@ -129,6 +131,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
     }
+
+    toString(): string {
+        return `Err(${toString(this.val)})`;
+    }
 }
 
 // This allows Err to be callable - possible because of the es5 compilation target
@@ -213,6 +219,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
      */
     safeUnwrap(): T {
         return this.val;
+    }
+
+    toString(): string {
+        return `Ok(${toString(this.val)})`;
     }
 }
 
@@ -303,14 +313,4 @@ export namespace Result {
     export function isResult<T = any, E = any>(val: unknown): val is Result<T, E> {
         return val instanceof Err || val instanceof Ok;
     }
-}
-
-function toString(val: unknown): string {
-    let value = String(val);
-    if (value === '[object Object]') {
-        try {
-            value = JSON.stringify(val);
-        } catch {}
-    }
-    return value;
 }

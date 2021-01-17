@@ -1,3 +1,5 @@
+import { toString } from './utils';
+
 interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the Option is Some */ readonly some: boolean;
     /** `true` when the Option is None */ readonly none: boolean;
@@ -73,6 +75,10 @@ class NoneImpl implements BaseOption<never> {
     andThen<T2>(op: (val: never) => Option<T2>): None {
         return this;
     }
+
+    toString(): string {
+        return 'None';
+    }
 }
 
 // Export None as a singleton, then freeze it so it can't be modified
@@ -146,6 +152,10 @@ class SomeImpl<T> implements BaseOption<T> {
      */
     safeUnwrap(): T {
         return this.val;
+    }
+
+    toString(): string {
+        return `Some(${toString(this.val)})`;
     }
 }
 
