@@ -210,3 +210,18 @@ test('safeUnwrap', () => {
         result.safeUnwrap();
     }
 });
+
+test('Issue #24', () => {
+    const getStatus = (payload: boolean): Result<boolean, Error> => {
+        if (payload) {
+            return Ok(payload);
+        }
+        return Err(new Error('Payload is false'));
+    };
+
+    const processStatus = (): Result<boolean, Error> => {
+        return getStatus(true)
+            .andThen((result) => Ok(result))
+            .map((data) => data);
+    };
+});
