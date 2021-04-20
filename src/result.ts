@@ -1,4 +1,5 @@
 import { toString } from './utils';
+import type { IsExact } from 'conditional-type-checks';
 
 /*
  * Missing Rust Result type methods:
@@ -200,6 +201,8 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return new Ok(mapper(this.val));
     }
 
+    andThen<T2>(mapper: (val: T) => Ok<T2>): Result<T2, never>;
+    andThen<T2>(mapper: (val: T) => Err<T2>): Result<never, T2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
         return mapper(this.val);
     }
@@ -232,14 +235,23 @@ export type Ok<T> = OkImpl<T>;
 
 export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
 
-export type ResultOkType<T extends Result<any, any>> = T extends Result<infer U, any> ? U : never;
-export type ResultErrType<T extends Result<any, any>> = T extends Result<any, infer U> ? U : never;
+export type ResultOkType<T extends Result<any, any>> = T extends BaseResult<infer O, infer E>
+    ? IsExact<Err<E>, T> extends true
+        ? never
+        : O
+    : never;
+
+export type ResultErrType<T extends Result<any, any>> = T extends BaseResult<infer O, infer E>
+    ? IsExact<Ok<O>, T> extends true
+        ? never
+        : E
+    : never;
 
 export type ResultOkTypes<T extends Result<any, any>[]> = {
-    [key in keyof T]: T[key] extends Result<infer U, any> ? U : never;
+    [key in keyof T]: T[key] extends Result<any, any> ? ResultOkType<T[key]> : never;
 };
 export type ResultErrTypes<T extends Result<any, any>[]> = {
-    [key in keyof T]: T[key] extends Result<any, infer U> ? U : never;
+    [key in keyof T]: T[key] extends Result<any, any> ? ResultErrType<T[key]> : never;
 };
 
 export namespace Result {

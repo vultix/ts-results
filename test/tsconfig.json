@@ -6,7 +6,8 @@
     "declaration": false,
     "declarationMap": false,
     "module": "commonjs",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "importHelpers": true
   },
   "include": ["../src/**/*.ts", "./**/*.ts"],
   "exclude": []

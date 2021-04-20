@@ -4,7 +4,7 @@ module.exports = {
     testRegex: '/test/.*.test.ts',
     globals: {
         'ts-jest': {
-            tsConfig: 'test/tsconfig.json',
+            tsconfig: 'test/tsconfig.json',
         },
     },
     collectCoverageFrom: ['src/**/*.ts'],
