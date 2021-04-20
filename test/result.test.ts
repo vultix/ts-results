@@ -37,7 +37,8 @@ test('andThen', () => {
     const result = new Ok('Ok') as Result<string, boolean>;
     const then = result.andThen(() => new Err('broke') as Result<boolean, string>);
     expect(then).toMatchResult(new Err('broke'));
-    eq<typeof then, Result<boolean, string | boolean>>(true);
+    function takesResult(result: Result<boolean, string | boolean>): void {}
+    takesResult(then);
 });
 
 test('mapErr', () => {

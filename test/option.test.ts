@@ -64,7 +64,6 @@ test('unwrap', () => {
 
 test('map / andThen', () => {
     expect(None.map(() => 1)).toBe(None);
-    // @ts-expect-error
     expect(None.andThen(() => 1)).toBe(None);
     expect(None.andThen(() => Some(1))).toBe(None);
 
@@ -72,6 +71,10 @@ test('map / andThen', () => {
     // @ts-expect-error
     someString.andThen(() => 1);
     expect(someString.andThen(() => Some(1))).toEqual(Some(1));
+
+    const mapped = (someString as Option<string>).andThen((val) => Some(!!val));
+    expect(mapped).toEqual(Some(true));
+    eq<typeof mapped, Option<boolean>>(true);
 });
 
 test('all / any', () => {

@@ -1,5 +1,4 @@
 import { toString } from './utils';
-import type { IsExact } from 'conditional-type-checks';
 
 /*
  * Missing Rust Result type methods:
@@ -121,11 +120,11 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         throw new Error(`Tried to unwrap Error: ${toString(this.val)}`);
     }
 
-    map<T2>(_mapper: (val: never) => T2): Err<E> {
+    map(_mapper: unknown): Err<E> {
         return this;
     }
 
-    andThen<T2, E2>(op: (val: never) => Result<T2, E2>): Err<E> {
+    andThen<T2, E2>(op: unknown): Err<E> {
         return this;
     }
 
@@ -201,13 +200,11 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return new Ok(mapper(this.val));
     }
 
-    andThen<T2>(mapper: (val: T) => Ok<T2>): Result<T2, never>;
-    andThen<T2>(mapper: (val: T) => Err<T2>): Result<never, T2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
         return mapper(this.val);
     }
 
-    mapErr<E2>(_mapper: (err: never) => E2): Ok<T> {
+    mapErr(_mapper: unknown): Ok<T> {
         return this;
     }
 
@@ -233,25 +230,16 @@ export class OkImpl<T> implements BaseResult<T, never> {
 export const Ok = OkImpl as typeof OkImpl & (<T>(val: T) => OkImpl<T>);
 export type Ok<T> = OkImpl<T>;
 
-export type Result<T, E> = (Ok<T> | Err<E>) & BaseResult<T, E>;
+export type Result<T, E> = Ok<T> | Err<E>;
 
-export type ResultOkType<T extends Result<any, any>> = T extends BaseResult<infer O, infer E>
-    ? IsExact<Err<E>, T> extends true
-        ? never
-        : O
-    : never;
-
-export type ResultErrType<T extends Result<any, any>> = T extends BaseResult<infer O, infer E>
-    ? IsExact<Ok<O>, T> extends true
-        ? never
-        : E
-    : never;
+export type ResultOkType<T extends Result<any, any>> = T extends Ok<infer U> ? U : never;
+export type ResultErrType<T> = T extends Err<infer U> ? U : never;
 
 export type ResultOkTypes<T extends Result<any, any>[]> = {
-    [key in keyof T]: T[key] extends Result<any, any> ? ResultOkType<T[key]> : never;
+    [key in keyof T]: T[key] extends Result<infer U, any> ? ResultOkType<T[key]> : never;
 };
 export type ResultErrTypes<T extends Result<any, any>[]> = {
-    [key in keyof T]: T[key] extends Result<any, any> ? ResultErrType<T[key]> : never;
+    [key in keyof T]: T[key] extends Result<infer U, any> ? ResultErrType<T[key]> : never;
 };
 
 export namespace Result {

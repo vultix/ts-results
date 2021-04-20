@@ -68,11 +68,11 @@ class NoneImpl implements BaseOption<never> {
         throw new Error(`Tried to unwrap None`);
     }
 
-    map<T2>(_mapper: (val: never) => T2): None {
+    map<T2>(_mapper: unknown): None {
         return this;
     }
 
-    andThen<T2>(op: (val: never) => Option<T2>): None {
+    andThen<T2>(op: unknown): None {
         return this;
     }
 
@@ -163,12 +163,12 @@ class SomeImpl<T> implements BaseOption<T> {
 export const Some = SomeImpl as typeof SomeImpl & (<T>(val: T) => SomeImpl<T>);
 export type Some<T> = SomeImpl<T>;
 
-export type Option<T> = (Some<T> | None) & BaseOption<T>;
+export type Option<T> = Some<T> | None;
 
-export type OptionSomeType<T extends Option<any>> = T extends Option<infer U> ? U : never;
+export type OptionSomeType<T extends Option<any>> = T extends Some<infer U> ? U : never;
 
 export type OptionSomeTypes<T extends Option<any>[]> = {
-    [key in keyof T]: T[key] extends Option<infer U> ? U : never;
+    [key in keyof T]: T[key] extends Option<any> ? OptionSomeType<T[key]> : never;
 };
 
 export namespace Option {
