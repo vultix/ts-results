@@ -1,3 +1,7 @@
+# v3.2.0
+
+- Fixes for Typescript 4.2
+
 # v3.1.0
 
 Big thank you to [@petehunt](https://github.com/petehunt) for all his work adding the `Option` type.
