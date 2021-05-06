@@ -85,6 +85,8 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     readonly err!: true;
     readonly val!: E;
 
+    private readonly _stack: string | undefined;
+
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
             next(): IteratorResult<never, never> {
@@ -101,6 +103,13 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         this.ok = false;
         this.err = true;
         this.val = val;
+
+        const stackLines = new Error().stack?.split('\n').slice(2);
+        if (stackLines && stackLines.length > 0 && stackLines[0].includes('ErrImpl')) {
+            stackLines.shift();
+        }
+
+        this._stack = stackLines?.join('\n');
     }
 
     /**
@@ -116,11 +125,11 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expect(msg: string): never {
-        throw new Error(`${msg} - Error: ${toString(this.val)}`);
+        throw new Error(`${msg} - Error: ${toString(this.val)}${this._stack ? `\n${this._stack}` : ''}`);
     }
 
     unwrap(): never {
-        throw new Error(`Tried to unwrap Error: ${toString(this.val)}`);
+        throw new Error(`Tried to unwrap Error: ${toString(this.val)}${this._stack ? `\n${this._stack}` : ''}`);
     }
 
     map(_mapper: unknown): Err<E> {
@@ -137,6 +146,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     toString(): string {
         return `Err(${toString(this.val)})`;
+    }
+
+    get stack(): string | undefined {
+        return this._stack ? `${this.toString()}\n${this._stack}` : undefined;
     }
 }
 
