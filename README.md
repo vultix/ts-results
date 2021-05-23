@@ -173,13 +173,16 @@ if (result.err) {
 ```
 
 ### Stack Trace
+
 A stack trace is generated when an `Err` is created.
+
 ```typescript
-let error = Err("Uh Oh");
+let error = Err('Uh Oh');
 let stack = error.stack;
 ```
 
 #### Unwrap
+
 ```typescript
 let goodResult = new Ok(1);
 let badResult = new Err(new Error('something went wrong'));

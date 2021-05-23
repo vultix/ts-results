@@ -1,10 +1,10 @@
 # v3.2.1
 
-- Fix regression found in [Issue#24](https://github.com/vultix/ts-results/issues/24)
+-   Fix regression found in [Issue#24](https://github.com/vultix/ts-results/issues/24)
 
 # v3.2.0
 
-- Fixes for Typescript 4.2
+-   Fixes for Typescript 4.2
 
 # v3.1.0
 
