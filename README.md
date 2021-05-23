@@ -152,7 +152,7 @@ let errorResult: Result<number, Error> = Err(new Error('bad number!'));
 ```
 
 #### Type Safety
-
+_Note: Typescript currently has a [bug](https://github.com/microsoft/TypeScript/issues/10564), making this type narrowing only work when `strictNullChecks` is turned on._
 ```typescript
 let result: Result<number, Error> = Ok(1);
 if (result.ok) {
