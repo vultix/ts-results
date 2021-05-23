@@ -1,4 +1,5 @@
 import { toString } from './utils';
+import { Result, Ok, Err } from './result';
 
 interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the Option is Some */ readonly some: boolean;
@@ -33,12 +34,17 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
     andThen<T2>(mapper: (val: T) => Option<T2>): Option<T2>;
 
     /**
-     * Maps a `Option<T, E>` to `Option<U, E>` by applying a function to a contained `Some` value,
+     * Maps an `Option<T>` to `Option<U>` by applying a function to a contained `Some` value,
      * leaving a `None` value untouched.
      *
      * This function can be used to compose the Options of two functions.
      */
     map<U>(mapper: (val: T) => U): Option<U>;
+
+    /**
+     * Maps an `Option<T>` to a `Result<T, E>`.
+     */
+    toResult<E>(error: E): Result<T, E>;
 }
 
 /**
@@ -74,6 +80,10 @@ class NoneImpl implements BaseOption<never> {
 
     andThen<T2>(op: unknown): None {
         return this;
+    }
+
+    toResult<E>(error: E): Err<E> {
+        return Err(error);
     }
 
     toString(): string {
@@ -139,6 +149,10 @@ class SomeImpl<T> implements BaseOption<T> {
 
     andThen<T2>(mapper: (val: T) => Option<T2>): Option<T2> {
         return mapper(this.val);
+    }
+
+    toResult<E>(error: E): Ok<T> {
+        return Ok(this.val);
     }
 
     /**

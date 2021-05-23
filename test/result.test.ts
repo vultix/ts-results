@@ -1,4 +1,15 @@
-import { Err, Ok, Result, ResultErrType, ResultErrTypes, ResultOkType, ResultOkTypes, Some } from '../src';
+import {
+    Err,
+    None,
+    Ok,
+    Option,
+    Result,
+    ResultErrType,
+    ResultErrTypes,
+    ResultOkType,
+    ResultOkTypes,
+    Some,
+} from '../src';
 import { eq } from './util';
 
 test('Err<E> | Ok<T> should be Result<T, E>', () => {
@@ -224,4 +235,15 @@ test('Issue #24', () => {
             .andThen((result) => Ok(result))
             .map((data) => data);
     };
+});
+
+test('To option', () => {
+    const result = new Ok('hello') as Result<string, number>;
+    const option = result.toOption();
+    eq<typeof option, Option<string>>(true);
+    expect(option).toEqual(Some('hello'));
+
+    const result2: Result<string, number> = new Err(32);
+    const option2 = result2.toOption();
+    expect(option2).toEqual(None);
 });

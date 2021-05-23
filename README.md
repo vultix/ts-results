@@ -148,26 +148,23 @@ import { Result, Err, Ok } from 'ts-results';
 
 ```typescript
 let okResult: Result<number, Error> = Ok(10);
-let okResult2 = Ok<number, Error>(10); // Exact same as above
-
-let errorResult: Result<number, Error> = Ok(new Error('bad number!'));
-let errorResult2 = Ok<number, Error>(new Error('bad number!')); // Exact same as above
+let errorResult: Result<number, Error> = Err(new Error('bad number!'));
 ```
 
 #### Type Safety
 
 ```typescript
-let result = Ok<number, Error>(1);
+let result: Result<number, Error> = Ok(1);
 if (result.ok) {
     // Typescript knows that result.val is a number because result.ok was true
     let number = result.val + 1;
 } else {
-    // Typescript knows that result.val is an Error because result.ok was false
+    // Typescript knows that result.val is an `Error` because result.ok was false
     console.error(result.val.message);
 }
 
 if (result.err) {
-    // Typescript knows that result.val is an Error because result.err was true
+    // Typescript knows that result.val is an `Error` because result.err was true
     console.error(result.val.message);
 } else {
     // Typescript knows that result.val is a number because result.err was false
@@ -175,8 +172,14 @@ if (result.err) {
 }
 ```
 
-#### Unwrap
+### Stack Trace
+A stack trace is generated when an `Err` is created.
+```typescript
+let error = Err("Uh Oh");
+let stack = error.stack;
+```
 
+#### Unwrap
 ```typescript
 let goodResult = new Ok(1);
 let badResult = new Err(new Error('something went wrong'));
@@ -188,8 +191,8 @@ badResult.unwrap(); // throws Error("something went wrong")
 #### Expect
 
 ```typescript
-let goodResult = Ok<number, Error>(1);
-let badResult = Err<number, Error>(new Error('something went wrong'));
+let goodResult = Ok(1);
+let badResult = Err(new Error('something went wrong'));
 
 goodResult.expect('goodResult should be a number'); // 1
 badResult.expect('badResult should be a number'); // throws Error("badResult should be a number - Error: something went wrong")

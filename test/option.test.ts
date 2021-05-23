@@ -1,4 +1,4 @@
-import { None, Option, OptionSomeType, Some } from '../src';
+import { Err, None, Ok, Option, OptionSomeType, Result, Some } from '../src';
 import { eq } from './util';
 
 const someString = Some('foo');
@@ -104,4 +104,18 @@ test('to string', () => {
     expect(`${Some(1)}`).toEqual('Some(1)');
     expect(`${Some({ name: 'George' })}`).toEqual('Some({"name":"George"})');
     expect(`${None}`).toEqual('None');
+});
+
+test('to result', () => {
+    const option = Some(1) as Option<number>;
+    const result = option.toResult('error');
+    eq<typeof result, Result<number, string>>(true);
+
+    expect(result).toMatchResult(Ok(1));
+
+    const option2 = None as Option<number>;
+    const result2 = option2.toResult('error');
+    eq<typeof result2, Result<number, string>>(true);
+
+    expect(result2).toMatchResult(Err('error'));
 });

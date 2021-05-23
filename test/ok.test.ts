@@ -74,11 +74,11 @@ test('map', () => {
 test('andThen', () => {
     const ok = new Ok('Ok').andThen(() => new Ok(3));
     expect(ok).toMatchResult(Ok(3));
-    eq<typeof ok, Result<number, unknown>>(true);
+    eq<typeof ok, Ok<number>>(true);
 
     const err = new Ok('Ok').andThen(() => new Err(false));
     expect(err).toMatchResult(Err(false));
-    eq<typeof err, Result<unknown, boolean>>(true);
+    eq<typeof err, Result<string, boolean>>(true);
 });
 
 test('mapErr', () => {

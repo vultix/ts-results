@@ -1,4 +1,5 @@
 import { toString } from './utils';
+import { Option, None, Some } from './option';
 
 /*
  * Missing Rust Result type methods:
@@ -72,6 +73,13 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
+
+    /**
+     *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
+     *
+     *  Similar to rust's `ok` method
+     */
+    toOption(): Option<T>;
 }
 
 /**
@@ -85,7 +93,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     readonly err!: true;
     readonly val!: E;
 
-    private readonly _stack: string | undefined;
+    private readonly _stack!: string;
 
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
@@ -104,12 +112,12 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         this.err = true;
         this.val = val;
 
-        const stackLines = new Error().stack?.split('\n').slice(2);
+        const stackLines = new Error().stack!.split('\n').slice(2);
         if (stackLines && stackLines.length > 0 && stackLines[0].includes('ErrImpl')) {
             stackLines.shift();
         }
 
-        this._stack = stackLines?.join('\n');
+        this._stack = stackLines.join('\n');
     }
 
     /**
@@ -125,11 +133,11 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expect(msg: string): never {
-        throw new Error(`${msg} - Error: ${toString(this.val)}${this._stack ? `\n${this._stack}` : ''}`);
+        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`);
     }
 
     unwrap(): never {
-        throw new Error(`Tried to unwrap Error: ${toString(this.val)}${this._stack ? `\n${this._stack}` : ''}`);
+        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`);
     }
 
     map(_mapper: unknown): Err<E> {
@@ -144,12 +152,16 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return new Err(mapper(this.val));
     }
 
+    toOption(): Option<never> {
+        return None;
+    }
+
     toString(): string {
         return `Err(${toString(this.val)})`;
     }
 
     get stack(): string | undefined {
-        return this._stack ? `${this.toString()}\n${this._stack}` : undefined;
+        return `${this}\n${this._stack}`;
     }
 }
 
@@ -225,6 +237,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     mapErr(_mapper: unknown): Ok<T> {
         return this;
+    }
+
+    toOption(): Option<T> {
+        return Some(this.val);
     }
 
     /**

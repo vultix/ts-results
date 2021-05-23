@@ -97,7 +97,21 @@ test('to string', () => {
 });
 
 test('stack trace', () => {
-    expect(Err(1).stack).toMatch(/err\.test\.ts/);
-    expect(Err(1).stack).toMatch(/Err\(1\)/);
-    expect(Err(1).stack).not.toMatch(/ErrImpl/);
+    function first(): Err<number> {
+        return second();
+    }
+
+    function second(): Err<number> {
+        return Err(1);
+    }
+
+    const err = first();
+    expect(err.stack).toMatch(/at second/);
+    expect(err.stack).toMatch(/at first/);
+    expect(err.stack).toMatch(/err\.test\.ts/);
+    expect(err.stack).toMatch(/Err\(1\)/);
+    expect(err.stack).not.toMatch(/ErrImpl/);
+
+    const err2 = Err(new Error('inner error'));
+    expect(err2.stack).toMatch(/Err\(Error: inner error\)/);
 });
