@@ -1,3 +1,9 @@
+# 3.3.0
+Big thank you to [@petehunt](https://github.com/petehunt) for all his work adding stack traces to `Err`.
+
+-   Added a `stack` property to all `Err` objects.  Can be used to pull a stack trace
+-   Added `toOption` and `toResult` methods for converting between `Option` and `Result` objects
+
 # v3.2.1
 
 -   Fix regression found in [Issue#24](https://github.com/vultix/ts-results/issues/24)
