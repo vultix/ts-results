@@ -11,6 +11,10 @@
     "test": "jest",
     "format": "prettier . --write"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vultix/ts-results.git"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
