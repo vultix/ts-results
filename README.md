@@ -16,6 +16,7 @@ Brings compile-time error checking and optional values to typescript.
     -   [Type Safety](#type-safety)
     -   [Unwrap](#unwrap)
     -   [Expect](#expect)
+    -   [ExpectErr](#expecterr)
     -   [Map, MapErr](#map-and-maperr)
     -   [Else](#else)
     -   [UnwrapOr](#unwrapor)
@@ -200,6 +201,17 @@ let badResult = Err(new Error('something went wrong'));
 goodResult.expect('goodResult should be a number'); // 1
 badResult.expect('badResult should be a number'); // throws Error("badResult should be a number - Error: something went wrong")
 ```
+
+#### ExpectErr
+
+```typescript
+let goodResult = Ok(1);
+let badResult = Err(new Error('something went wrong'));
+
+goodResult.expect('goodResult should not be a number'); // throws Error("goodResult should not be a number")
+badResult.expect('badResult should not be a number'); // new Error('something went wrong')
+```
+
 
 #### Map and MapErr
 
