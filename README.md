@@ -17,6 +17,7 @@ Brings compile-time error checking and optional values to typescript.
     -   [Unwrap](#unwrap)
     -   [Expect](#expect)
     -   [Map, MapErr](#map-and-maperr)
+    -   [andThen](#andthen)
     -   [Else](#else)
     -   [UnwrapOr](#unwrapor)
     -   [Empty](#empty)
@@ -218,6 +219,30 @@ badResult
     .map((num) => num + 1)
     .mapErr((err) => new Error('mapped'))
     .unwrap(); // throws Error("mapped")
+```
+
+#### andThen
+
+```typescript
+let goodResult = Ok(1);
+let badResult = Err(new Error('something went wrong'));
+
+goodResult.andThen((num) => new Ok(num + 1)).unwrap(); // 2
+badResult.andThen((num) => new Err(new Error('2nd error'))).unwrap(); // throws Error('something went wrong')
+goodResult.andThen((num) => new Err(new Error('2nd error'))).unwrap(); // throws Error('2nd error')
+
+goodResult
+    .andThen((num) => new Ok(num + 1))
+    .mapErr((err) => new Error('mapped'))
+    .unwrap(); // 2
+badResult
+    .andThen((num) => new Err(new Error('2nd error')))
+    .mapErr((err) => new Error('mapped'))
+    .unwrap(); // throws Error('mapped')
+goodResult
+    .andThen((num) => new Err(new Error('2nd error')))
+    .mapErr((err) => new Error('mapped'))
+    .unwrap(); // thros Error('mapped')
 ```
 
 #### Else
