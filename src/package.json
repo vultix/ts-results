@@ -1,5 +1,5 @@
 {
-  "name": "ts-results",
+  "name": "ts-results-es",
   "version": "3.3.0",
   "description": "A typescript implementation of Rust's Result and Option objects.",
   "exports": "./esm/index.js",
@@ -27,7 +27,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vultix/ts-results"
+    "url": "https://github.com/lune-climate/ts-results-es"
   },
   "readme": "README.md"
 }
