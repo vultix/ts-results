@@ -1,4 +1,4 @@
-# ts-results
+# ts-results-ts
 
 A typescript implementation of Rust's [Result](https://doc.rust-lang.org/std/result/)
 and [Option](https://doc.rust-lang.org/std/option/) objects.
@@ -37,13 +37,13 @@ Brings compile-time error checking and optional values to typescript.
 ## Installation
 
 ```bash
-$ npm install ts-results
+$ npm install ts-results-es
 ```
 
 or
 
 ```bash
-$ yarn add ts-results
+$ yarn add ts-results-es
 ```
 
 ## Example
@@ -72,7 +72,7 @@ To this:
 
 ```typescript
 import { existsSync, readFileSync } from 'fs';
-import { Ok, Err, Result } from 'ts-results';
+import { Ok, Err, Result } from 'ts-results-es';
 
 function readFile(path: string): Result<string, 'invalid path'> {
     if (existsSync(path)) {
@@ -119,7 +119,7 @@ console.log(optionalUrl);
 To this:
 
 ```typescript
-import { Option, Some, None } from 'ts-results';
+import { Option, Some, None } from 'ts-results-es';
 
 declare function getLoggedInUsername(): Option<string>;
 
@@ -141,7 +141,7 @@ if (optionalUrl.some) {
 ## Usage
 
 ```typescript
-import { Result, Err, Ok } from 'ts-results';
+import { Result, Err, Ok } from 'ts-results-es';
 ```
 
 #### Creation
@@ -286,8 +286,8 @@ operator on a stream of Result objects.
 
 ```typescript
 import { of, Observable } from 'rxjs';
-import { Ok, Err, Result } from 'ts-results';
-import { resultMap } from 'ts-results/rxjs-operators';
+import { Ok, Err, Result } from 'ts-results-es';
+import { resultMap } from 'ts-results-es/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(Ok(5), Err('uh oh'));
 
@@ -311,7 +311,7 @@ greaterThanZero.subscribe((result) => {
 #### resultMapErr
 
 ```typescript
-import { resultMapErr } from 'ts-results/rxjs-operators';
+import { resultMapErr } from 'ts-results-es/rxjs-operators';
 ```
 
 Behaves exactly the same as [resultMap](#resultmap), but maps the error value.
@@ -319,7 +319,7 @@ Behaves exactly the same as [resultMap](#resultmap), but maps the error value.
 #### resultMapTo
 
 ```typescript
-import { resultMapTo } from 'ts-results/rxjs-operators';
+import { resultMapTo } from 'ts-results-es/rxjs-operators';
 ```
 
 Behaves the same as [resultMap](#resultmap), but takes a value instead of a function.
@@ -327,7 +327,7 @@ Behaves the same as [resultMap](#resultmap), but takes a value instead of a func
 #### resultMapErrTo
 
 ```typescript
-import { resultMapErrTo } from 'ts-results/rxjs-operators';
+import { resultMapErrTo } from 'ts-results-es/rxjs-operators';
 ```
 
 Behaves the same as [resultMapErr](#resultmaperr), but takes a value instead of a function.
@@ -340,8 +340,8 @@ Similar to calling the [else](#else) function, but works on a stream of Result o
 
 ```typescript
 import { of, Observable } from 'rxjs';
-import { Ok, Err, Result } from 'ts-results';
-import { elseMap } from 'ts-results/rxjs-operators';
+import { Ok, Err, Result } from 'ts-results-es';
+import { elseMap } from 'ts-results-es/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(Ok(5), Err(new Error('uh oh')));
 
@@ -366,7 +366,7 @@ doubled.subscribe((number) => {
 #### elseMapTo
 
 ```typescript
-import { elseMapTo } from 'ts-results/rxjs-operators';
+import { elseMapTo } from 'ts-results-es/rxjs-operators';
 ```
 
 Behaves the same as [elseMap](#elsemap), but takes a value instead of a function.
@@ -386,8 +386,8 @@ into a stream of `Result<T2, E | T2>` objects.
 
 ```typescript
 import { of, Observable } from 'rxjs';
-import { Ok, Err, Result } from 'ts-results';
-import { resultMergeMap } from 'ts-results/rxjs-operators';
+import { Ok, Err, Result } from 'ts-results-es';
+import { resultMergeMap } from 'ts-results-es/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
@@ -422,8 +422,8 @@ Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the
 
 ```typescript
 import { of, Observable } from 'rxjs';
-import { Ok, Err, Result } from 'ts-results';
-import { filterResultOk } from 'ts-results/rxjs-operators';
+import { Ok, Err, Result } from 'ts-results-es';
+import { filterResultOk } from 'ts-results-es/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
@@ -443,8 +443,8 @@ Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the
 
 ```typescript
 import { of, Observable } from 'rxjs';
-import { Ok, Err, Result } from 'ts-results';
-import { filterResultOk } from 'ts-results/rxjs-operators';
+import { Ok, Err, Result } from 'ts-results-es';
+import { filterResultOk } from 'ts-results-es/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
