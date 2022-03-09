@@ -1,5 +1,5 @@
 {
-  "name": "ts-results",
+  "name": "ts-results-es",
   "version": "3.3.0",
   "description": "A typescript implementation of Rust's Result and Option objects.",
   "private": true,
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vultix/ts-results.git"
+    "url": "https://github.com/lune-climate/ts-results-es.git"
   },
   "keywords": [],
   "author": "",
