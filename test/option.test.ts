@@ -1,5 +1,5 @@
-import { Err, None, Ok, Option, OptionSomeType, Result, Some } from '../src';
-import { eq } from './util';
+import { Err, None, Ok, Option, OptionSomeType, Result, Some } from '../src/index.js';
+import { eq } from './util.js';
 
 const someString = Some('foo');
 const someNum = new Some(10);

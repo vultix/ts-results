@@ -1,2 +1,2 @@
-export * from './result';
-export * from './option';
+export * from './result.js';
+export * from './option.js';

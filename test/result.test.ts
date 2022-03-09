@@ -9,8 +9,8 @@ import {
     ResultOkType,
     ResultOkTypes,
     Some,
-} from '../src';
-import { eq } from './util';
+} from '../src/index.js';
+import { eq } from './util.js';
 
 test('Err<E> | Ok<T> should be Result<T, E>', () => {
     const r1 = Err(0);

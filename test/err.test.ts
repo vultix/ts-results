@@ -1,6 +1,6 @@
 import { assert } from 'conditional-type-checks';
-import { Err, Ok } from '../src';
-import { eq, expect_never } from './util';
+import { Err, Ok } from '../src/index.js';
+import { eq, expect_never } from './util.js';
 
 test('Constructable & Callable', () => {
     const a = new Err(3);
