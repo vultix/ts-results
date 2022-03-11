@@ -1,11 +1,9 @@
 name: CI
 
-on:
+on: 
   push:
-    branches: [ $default-branch ]
+    branches: [ master ]
   pull_request:
-    branches: [ $default-branch ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
