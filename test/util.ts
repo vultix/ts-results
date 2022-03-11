@@ -1,5 +1,5 @@
 import { IsExact, IsNever } from 'conditional-type-checks';
-import { Result } from '../src';
+import { Result } from '../src/index.js';
 import { Observable } from 'rxjs';
 
 export function expect_string<T>(x: T, y: IsExact<T, string>) {}

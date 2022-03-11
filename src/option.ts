@@ -1,5 +1,5 @@
-import { toString } from './utils';
-import { Result, Ok, Err } from './result';
+import { toString } from './utils.js';
+import { Result, Ok, Err } from './result.js';
 
 interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the Option is Some */ readonly some: boolean;
