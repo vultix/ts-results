@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "npm run clean && npm run build:ts && npm run build:copy",
-    "build:ts": "tsc -p tsconfig.json && tsc -p tsconfig.json -m esnext --outDir dist/esm/ -d false -declarationMap false",
+    "build:ts": "tsc -p tsconfig-cjs.json && tsc -p tsconfig-esm.json",
     "build:copy": "copyfiles README.md LICENSE src/package.json dist --flat && copyfiles src/rxjs-operators/package.json dist --up 1",
     "clean": "rm -rf dist",
     "test": "jest",
