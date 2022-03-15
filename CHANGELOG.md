@@ -1,3 +1,10 @@
+# 3.4.0
+
+-   Fixed some type errors that prevented the package from being built with recent
+    TypeScript versions
+-   Fixed ESM compatibility so that client code can use named imports without resorting
+    to workarounds (fixes https://github.com/vultix/ts-results/issues/37)
+
 # 3.3.0
 Big thank you to [@petehunt](https://github.com/petehunt) for all his work adding stack traces to `Err`.
 
