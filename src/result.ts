@@ -133,11 +133,17 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expect(msg: string): never {
-        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`);
+        // The cause casting required because of the current TS definition beign overly restrictive
+        // (the definition says it has to be an Error while it can be anything).
+        // See https://github.com/microsoft/TypeScript/issues/45167
+        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
     }
 
     unwrap(): never {
-        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`);
+        // The cause casting required because of the current TS definition beign overly restrictive
+        // (the definition says it has to be an Error while it can be anything).
+        // See https://github.com/microsoft/TypeScript/issues/45167
+        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
     }
 
     map(_mapper: unknown): Err<E> {
