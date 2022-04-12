@@ -94,6 +94,10 @@ test('mapErr', () => {
     eq<typeof ok, Ok<string>>(true);
 });
 
+test('mapOr', () => {
+    expect(Ok(11).mapOr(1, (val) => val * 2)).toEqual(22)
+});
+
 test('iterable', () => {
     let i = 0;
     for (const char of Ok('hello')) {

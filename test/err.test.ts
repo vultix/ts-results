@@ -100,6 +100,10 @@ test('mapErr', () => {
     eq<typeof err, Err<number>>(true);
 });
 
+test('mapOr', () => {
+    expect(Err('Some error').mapOr(1, () => -1)).toEqual(1)
+});
+
 test('iterable', () => {
     for (const item of Err([123])) {
         expect_never(item, true);

@@ -77,6 +77,11 @@ test('map / andThen', () => {
     eq<typeof mapped, Option<boolean>>(true);
 });
 
+test('mapOr', () => {
+    expect(None.mapOr(1, () => -1)).toEqual(1)
+    expect(Some(11).mapOr(1, (val) => val * 2)).toEqual(22)
+});
+
 test('all / any', () => {
     const strings = ['foo', 'bar', 'baz'] as const;
     const options = [Some('foo' as const), Some('bar' as const), Some('baz' as const)] as const;

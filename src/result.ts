@@ -5,7 +5,6 @@ import { Option, None, Some } from './option.js';
  * Missing Rust Result type methods:
  * pub fn contains<U>(&self, x: &U) -> bool
  * pub fn contains_err<F>(&self, f: &F) -> bool
- * pub fn map_or<U, F>(self, default: U, f: F) -> U
  * pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
  * pub fn and<U>(self, res: Result<U, E>) -> Result<U, E>
  * pub fn or<F>(self, res: Result<T, F>) -> Result<T, F>
@@ -79,6 +78,12 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
+
+    /**
+     * Maps a `Result<T, E>` to `Result<U, E>` by either converting `T` to `U` using `mapper`
+     * (in case of `Ok`) or using the `default_` value (in case of `Err`).
+     */
+    mapOr<U>(default_: U, mapper: (val: T) => U): U;
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -166,6 +171,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
+    }
+
+    mapOr<U>(default_: U, _mapper: unknown): U {
+        return default_;
     }
 
     toOption(): Option<never> {
@@ -257,6 +266,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     mapErr(_mapper: unknown): Ok<T> {
         return this;
+    }
+
+    mapOr<U>(_default_: U, mapper: (val: T) => U): U {
+        return mapper(this.val);
     }
 
     toOption(): Option<T> {

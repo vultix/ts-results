@@ -246,6 +246,16 @@ badResult
     .unwrap(); // throws Error("mapped")
 ```
 
+#### MapOr
+
+```typescript
+let goodResult = Ok(1);
+let badResult = Err(new Error('something went wrong'));
+
+goodResult.mapOr(0, (value) => -value) // -1
+badResult.mapOr(0, (value) => -value) // 0
+```
+
 #### andThen
 
 ```typescript
