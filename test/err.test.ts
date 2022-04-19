@@ -100,8 +100,9 @@ test('mapErr', () => {
     eq<typeof err, Err<number>>(true);
 });
 
-test('mapOr', () => {
+test('mapOr / mapOrElse', () => {
     expect(Err('Some error').mapOr(1, () => -1)).toEqual(1)
+    expect(Err('Some error').mapOrElse(() => 1, () => -1)).toEqual(1)
 });
 
 test('iterable', () => {

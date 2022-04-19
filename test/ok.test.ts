@@ -94,8 +94,9 @@ test('mapErr', () => {
     eq<typeof ok, Ok<string>>(true);
 });
 
-test('mapOr', () => {
+test('mapOr / mapOrElse', () => {
     expect(Ok(11).mapOr(1, (val) => val * 2)).toEqual(22)
+    expect(Ok(11).mapOrElse(() => 1, (val) => val * 2)).toEqual(22)
 });
 
 test('iterable', () => {

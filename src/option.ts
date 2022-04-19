@@ -44,8 +44,17 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
     /**
      * Maps an `Option<T>` to `Option<U>` by either converting `T` to `U` using `mapper` (in case
      * of `Some`) or using the `default_` value (in case of `None`).
+     *
+     * If `default` is a result of a function call consider using `mapOrElse` instead, it will
+     * only evaluate the function when needed.
      */
     mapOr<U>(default_: U, mapper: (val: T) => U): U;
+
+    /**
+     * Maps an `Option<T>` to `Option<U>` by either converting `T` to `U` using `mapper` (in case
+     * of `Some`) or producing a default value using the `default` function (in case of `None`).
+     */
+    mapOrElse<U>(default_: () => U, mapper: (val: T) => U): U;
 
     /**
      * Maps an `Option<T>` to a `Result<T, E>`.
@@ -86,6 +95,10 @@ class NoneImpl implements BaseOption<never> {
 
     mapOr<T2>(default_: T2, _mapper: unknown): T2 {
         return default_;
+    }
+
+    mapOrElse<U>(default_: () => U, _mapper: unknown): U {
+        return default_();
     }
 
     andThen<T2>(op: unknown): None {
@@ -158,6 +171,10 @@ class SomeImpl<T> implements BaseOption<T> {
     }
 
     mapOr<T2>(_default_: T2, mapper: (val: T) => T2): T2 {
+        return mapper(this.val);
+    }
+
+    mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
         return mapper(this.val);
     }
 

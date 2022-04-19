@@ -5,7 +5,6 @@ import { Option, None, Some } from './option.js';
  * Missing Rust Result type methods:
  * pub fn contains<U>(&self, x: &U) -> bool
  * pub fn contains_err<F>(&self, f: &F) -> bool
- * pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
  * pub fn and<U>(self, res: Result<U, E>) -> Result<U, E>
  * pub fn or<F>(self, res: Result<T, F>) -> Result<T, F>
  * pub fn or_else<F, O>(self, op: O) -> Result<T, F>
@@ -82,8 +81,18 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by either converting `T` to `U` using `mapper`
      * (in case of `Ok`) or using the `default_` value (in case of `Err`).
+     *
+     * If `default` is a result of a function call consider using `mapOrElse` instead, it will
+     * only evaluate the function when needed.
      */
     mapOr<U>(default_: U, mapper: (val: T) => U): U;
+
+    /**
+     * Maps a `Result<T, E>` to `Result<U, E>` by either converting `T` to `U` using `mapper`
+     * (in case of `Ok`) or producing a default value using the `default` function (in case of
+     * `Err`).
+     */
+    mapOrElse<U>(default_: () => U, mapper: (val: T) => U): U;
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -175,6 +184,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     mapOr<U>(default_: U, _mapper: unknown): U {
         return default_;
+    }
+
+    mapOrElse<U>(default_: () => U, _mapper: unknown): U {
+        return default_();
     }
 
     toOption(): Option<never> {
@@ -269,6 +282,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     mapOr<U>(_default_: U, mapper: (val: T) => U): U {
+        return mapper(this.val);
+    }
+
+    mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
         return mapper(this.val);
     }
 

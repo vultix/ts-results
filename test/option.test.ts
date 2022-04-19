@@ -77,9 +77,12 @@ test('map / andThen', () => {
     eq<typeof mapped, Option<boolean>>(true);
 });
 
-test('mapOr', () => {
+test('mapOr / mapOrElse', () => {
     expect(None.mapOr(1, () => -1)).toEqual(1)
+    expect(None.mapOrElse(() => 1, () => -1)).toEqual(1)
+
     expect(Some(11).mapOr(1, (val) => val * 2)).toEqual(22)
+    expect(Some(11).mapOrElse(() => { throw new Error('Should not happen'); }, (val) => val * 2)).toEqual(22)
 });
 
 test('all / any', () => {
