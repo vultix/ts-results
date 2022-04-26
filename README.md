@@ -31,6 +31,7 @@ can become obsolete.
     -   [Expect](#expect)
     -   [ExpectErr](#expecterr)
     -   [Map, MapErr](#map-and-maperr)
+    -   [MapOr, MapOrElse](#mapor-and-maporelse)
     -   [AndThen](#andthen)
     -   [Else](#else)
     -   [UnwrapOr](#unwrapor)
