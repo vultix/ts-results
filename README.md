@@ -14,6 +14,8 @@ available with some fixes.
 Notable changes compared to the original package:
 
 * Added ESM compatibility
+* `Option` gained extra methods: `mapOr()` and `mapOrElse()`
+* `Result` also gained extra methods: `mapOr()`, `mapOrElse()` and `expectErr()`
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.

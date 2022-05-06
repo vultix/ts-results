@@ -1,3 +1,9 @@
+# 3.5.0
+
+- Added `andThen()` documentation, thanks to Drew De Ponte
+- Added the `expectErr()` method to `Result`, thanks to TheDudeFromCI
+- Added `mapOr()` and `mapOrElse()` to both `Option` and `Result`
+
 # 3.4.0
 
 -   Fixed some type errors that prevented the package from being built with recent
