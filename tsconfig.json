@@ -5,8 +5,10 @@
     "sourceMap": false,
     "declaration": true,
     "declarationMap": false,
-    "moduleResolution": "Node",
-    "module": "ESNext",
+    // Enforce using explicit file extensions
+    // Support for ".mjs" files need this.
+    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
     "noEmitHelpers": false,
     "skipLibCheck": true,
     "lib": ["es2015"],

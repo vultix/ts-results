@@ -1,11 +1,6 @@
-# Dist
 dist/
-
-#npm
 node_modules/
-
-# Intellij Files
-.idea
-
-# test coverage
-coverage
+.idea/
+.vscode/
+coverage/
+.DS_STORE

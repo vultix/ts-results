@@ -1,5 +1,5 @@
-import { toString } from './utils';
-import { Option, None, Some } from './option';
+import { toString } from './utils.js';
+import { Option, None, Some } from './option.js';
 
 export type ResultMatcher<T, E, OKRes, ErrRes> = {
     Ok: (val: T) => OKRes;
@@ -342,7 +342,7 @@ export namespace Result {
      *
      * @param promise - Promise to await. Will returned as `Result`.
      */
-    export function await<T, E = unknown>(promise: Promise<T>): Promise<Result<T, E>> {
+    export function wrapPromise<T, E = unknown>(promise: Promise<T>): Promise<Result<T, E>> {
         return promise.then((val) => new Ok(val)).catch((e) => new Err(e));
     }
 
@@ -364,7 +364,7 @@ export namespace Result {
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
-            return await(op());
+            return wrapPromise(op());
         } catch (e) {
             return Promise.resolve(new Err(e as E));
         }

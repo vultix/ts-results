@@ -5,10 +5,11 @@
     "sourceMap": true,
     "declaration": false,
     "declarationMap": false,
+    "moduleResolution": "Node",
     "module": "commonjs",
     "downlevelIteration": true,
     "importHelpers": true
   },
-  "include": ["../src/**/*.ts", "./**/*.ts"],
+  "include": ["../src/**/*.ts", "./**/*.ts", "../src/result.mts"],
   "exclude": []
 }

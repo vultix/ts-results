@@ -1,14 +1,16 @@
-module.exports = {
+export default {
     preset: 'ts-jest',
     testEnvironment: 'node',
     testRegex: '/test/.*.test.ts',
-    globals: {
-        'ts-jest': {
-            tsconfig: 'test/tsconfig.json',
-        },
+    transform: {
+        '^.+\\.tsx?$': [
+            'ts-jest',
+            {
+                tsconfig: 'test/tsconfig.json',
+            },
+        ],
     },
     collectCoverageFrom: ['src/**/*.ts'],
-    collectCoverage: true,
     coverageThreshold: {
         './src/**/*.ts': {
             branches: 100,
@@ -16,5 +18,10 @@ module.exports = {
             lines: 100,
             statements: 100,
         },
+    },
+    // Map Node ESM imports back to normal imports
+    // e.g. `./result.js` => `./result`
+    moduleNameMapper: {
+        "^(.*)\\.js$": "$1"
     },
 };

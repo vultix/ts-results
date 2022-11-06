@@ -1,6 +1,0 @@
-{
-  "name": "ts-results/rxjs-operators",
-  "types": "index.d.ts",
-  "main": "index.js",
-  "module": "../esm/rxjs-operators/index.js"
-}

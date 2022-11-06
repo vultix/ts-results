@@ -6,32 +6,55 @@
     "type": "git",
     "url": "https://github.com/fromgmworks/typescript-result"
   },
-  "keywords": ["rust", "result", "results", "ts-results", "promise", "functional", "async", "await"],
+  "keywords": [
+    "rust",
+    "result",
+    "results",
+    "ts-results",
+    "promise",
+    "functional",
+    "async",
+    "await"
+  ],
   "author": "Gabe M <hey@gabe.mx>",
   "license": "ISC",
   "main": "./dist/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "require": "./dist/index.js",
-      "import": "./dist/index.js"
+      "import": "./dist/esm/index.mjs"
+    },
+    "./rxjs-operators": {
+      "types": "./dist/rxjs-operators/index.d.ts",
+      "require": "./dist/rxjs-operators/index.js",
+      "import": "./dist/esm/rxjs-operators/index.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "xbuild": "npm run clean && npm run build:ts && npm run build:copy",
-    "xbuild:ts": "tsc -p tsconfig.json && tsc -p tsconfig.json -m esnext --outDir dist/esm/ -d false -declarationMap false",
-    "xbuild:copy": "copyfiles README.md LICENSE src/package.json dist --flat && copyfiles src/rxjs-operators/package.json dist --up 1",
-    "clean": "rm -rf dist",
-    "test": "jest",
-    "format": "prettier . --write"
+    "build": "npm run clean && concurrently \"npm:build:*\"",
+    "build:cjs": "tsc",
+    "build:esm": "tsc -m esnext --outDir dist/esm/",
+    "clean": "del ./dist",
+    "test": "concurrently \"npm:test:*\"",
+    "test:jest": "jest --collect-coverage",
+    "test:node": "node ./test/node/node-esm.test.mjs"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.22",
+    "@types/jest": "^29.2.2",
+    "@utx/result": "file:.",
+    "concurrently": "^7.5.0",
     "conditional-type-checks": "^1.0.5",
-    "copyfiles": "^2.4.1",
-    "jest": "^26.6.3",
+    "del-cli": "^5.0.0",
+    "jest": "^29.2.2",
     "prettier": "^2.2.1",
     "rxjs": "^6.6.7",
-    "ts-jest": "^26.5.4",
+    "ts-jest": "^29.0.3",
     "tslib": "^2.4.1",
     "typescript": "^4.8.4"
   }
