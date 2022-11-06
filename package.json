@@ -1,23 +1,29 @@
 {
-  "name": "ts-results",
+  "name": "@utx/result",
   "version": "3.3.0",
   "description": "A typescript implementation of Rust's Result and Option objects.",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fromgmworks/typescript-result"
+  },
+  "keywords": ["rust", "result", "results", "ts-results", "promise", "functional", "async", "await"],
+  "author": "Gabe M <hey@gabe.mx>",
+  "license": "ISC",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
-    "build": "npm run clean && npm run build:ts && npm run build:copy",
-    "build:ts": "tsc -p tsconfig.json && tsc -p tsconfig.json -m esnext --outDir dist/esm/ -d false -declarationMap false",
-    "build:copy": "copyfiles README.md LICENSE src/package.json dist --flat && copyfiles src/rxjs-operators/package.json dist --up 1",
+    "xbuild": "npm run clean && npm run build:ts && npm run build:copy",
+    "xbuild:ts": "tsc -p tsconfig.json && tsc -p tsconfig.json -m esnext --outDir dist/esm/ -d false -declarationMap false",
+    "xbuild:copy": "copyfiles README.md LICENSE src/package.json dist --flat && copyfiles src/rxjs-operators/package.json dist --up 1",
     "clean": "rm -rf dist",
     "test": "jest",
     "format": "prettier . --write"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vultix/ts-results.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "conditional-type-checks": "^1.0.5",
@@ -26,7 +32,7 @@
     "prettier": "^2.2.1",
     "rxjs": "^6.6.7",
     "ts-jest": "^26.5.4",
-    "tslib": "^2.1.0",
-    "typescript": "^4.2"
+    "tslib": "^2.4.1",
+    "typescript": "^4.8.4"
   }
 }

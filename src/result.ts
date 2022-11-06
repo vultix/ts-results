@@ -1,6 +1,11 @@
 import { toString } from './utils';
 import { Option, None, Some } from './option';
 
+export type ResultMatcher<T, E, OKRes, ErrRes> = {
+    Ok: (val: T) => OKRes;
+    Err: (err: E) => ErrRes;
+};
+
 /*
  * Missing Rust Result type methods:
  * pub fn contains<U>(&self, x: &U) -> bool
@@ -73,6 +78,11 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * This function can be used to pass through a successful result while handling an error.
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
+
+    /**
+     * Matches on a Result.
+     */
+    match<OkRes, ErrRes>(matcher: ResultMatcher<T, E, OkRes, ErrRes>): OkRes | ErrRes;
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -150,6 +160,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.val));
+    }
+
+    match<_OkRes, ErrRes>(matcher: ResultMatcher<never, E, _OkRes, ErrRes>): ErrRes {
+        return matcher.Err(this.val);
     }
 
     toOption(): Option<never> {
@@ -239,6 +253,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return this;
     }
 
+    match<OkRes, _ErrRes>(matcher: ResultMatcher<T, never, OkRes, _ErrRes>): OkRes {
+        return matcher.Ok(this.val);
+    }
+
     toOption(): Option<T> {
         return Some(this.val);
     }
@@ -320,6 +338,15 @@ export namespace Result {
     }
 
     /**
+     * Awaits a promise, catching any Errors in a `Result`.
+     *
+     * @param promise - Promise to await. Will returned as `Result`.
+     */
+    export function await<T, E = unknown>(promise: Promise<T>): Promise<Result<T, E>> {
+        return promise.then((val) => new Ok(val)).catch((e) => new Err(e));
+    }
+
+    /**
      * Wrap an operation that may throw an Error (`try-catch` style) into checked exception style
      * @param op The operation function
      */
@@ -327,7 +354,7 @@ export namespace Result {
         try {
             return new Ok(op());
         } catch (e) {
-            return new Err<E>(e);
+            return new Err<E>(e as E);
         }
     }
 
@@ -337,11 +364,9 @@ export namespace Result {
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
-            return op()
-                .then((val) => new Ok(val))
-                .catch((e) => new Err(e));
+            return await(op());
         } catch (e) {
-            return Promise.resolve(new Err(e));
+            return Promise.resolve(new Err(e as E));
         }
     }
 
