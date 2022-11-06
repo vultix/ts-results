@@ -1,14 +1,14 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "outDir": "./dist/",
+    "outDir": "./dist",
     "sourceMap": false,
     "declaration": true,
     "declarationMap": false,
-    // Enforce using explicit file extensions
-    // Support for ".mjs" files need this.
-    "moduleResolution": "NodeNext",
-    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    // Rollup will emit bundle
+    "noEmit": true,
     "noEmitHelpers": false,
     "skipLibCheck": true,
     "lib": ["es2015"],

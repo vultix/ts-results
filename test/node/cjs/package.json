@@ -1,6 +1,9 @@
 {
-  "name": "node-esm-test",
+  "name": "node-cjs-test",
   "version": "1.0.0",
   "type": "commonjs",
-  "main": "node.test.cjs"
+  "main": "node.test.cjs",
+  "dependencies": {
+    "@utx/result": "file:../../.."
+  }
 }

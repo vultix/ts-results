@@ -1,5 +1,5 @@
-import { toString } from './utils.js';
-import { Option, None, Some } from './option.js';
+import { toString } from './utils';
+import { Option, None, Some } from './option';
 
 export type ResultMatcher<T, E, OKRes, ErrRes> = {
     Ok: (val: T) => OKRes;

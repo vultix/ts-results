@@ -2,5 +2,8 @@
   "name": "node-esm-test",
   "version": "1.0.0",
   "type": "module",
-  "main": "node.test.mjs"
+  "main": "node.test.mjs",
+  "dependencies": {
+    "@utx/result": "file:../../.."
+  }
 }
