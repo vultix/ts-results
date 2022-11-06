@@ -10,6 +10,6 @@
     "downlevelIteration": true,
     "importHelpers": true
   },
-  "include": ["../src/**/*.ts", "./**/*.ts", "../src/result.mts"],
+  "include": ["../src/**/*.ts", "./**/*.ts"],
   "exclude": []
 }
