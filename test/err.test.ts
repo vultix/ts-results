@@ -115,3 +115,13 @@ test('stack trace', () => {
     const err2 = Err(new Error('inner error'));
     expect(err2.stack).toMatch(/Err\(Error: inner error\)/);
 });
+
+
+test('match', () => {
+    const match = Err(1).match({
+        Ok: () => 'good' as const,
+        Err: () => 'bad' as const,
+    })
+    eq<typeof match, 'bad'>(true);
+    expect(match).toBe('bad')
+})

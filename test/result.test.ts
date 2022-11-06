@@ -247,3 +247,13 @@ test('To option', () => {
     const option2 = result2.toOption();
     expect(option2).toEqual(None);
 });
+
+test('match', () => {
+    const result = Ok('test') as Result<string, number>;
+    const match = result.match({
+        Ok: () => 'good' as const,
+        Err: () => 'bad' as const,
+    })
+    eq<typeof match, 'good' | 'bad'>(true);
+    expect(match).toBe('good')
+})

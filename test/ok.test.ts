@@ -113,3 +113,12 @@ test('to string', () => {
     expect(`${Ok(1)}`).toEqual('Ok(1)');
     expect(`${Ok({ name: 'George' })}`).toEqual('Ok({"name":"George"})');
 });
+
+test('match', () => {
+    const match = Ok(1).match({
+        Ok: () => 'good' as const,
+        Err: () => 'bad' as const,
+    })
+    eq<typeof match, 'good'>(true);
+    expect(match).toBe('good')
+})
