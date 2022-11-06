@@ -3,6 +3,6 @@ import * as AllRxjs from '@utx/result/rxjs-operators';
 
 
 
-console.log('✨ Successfully imported All imports in mjs mode.', {
+console.log('✨ Successfully imported All imports in MJS mode.', {
     imports: [AllResults, AllRxjs]
 });
