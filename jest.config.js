@@ -17,4 +17,8 @@ module.exports = {
             statements: 100,
         },
     },
+    moduleNameMapper: {
+      "^(.*)\\.js$": "$1"
+    },
+
 };

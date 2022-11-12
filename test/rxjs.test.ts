@@ -1,4 +1,4 @@
-import { Err, Ok, Result } from '../src';
+import { Err, Ok, Result } from '../src/index.js';
 import { Observable, of } from 'rxjs';
 import {
     elseMap,
@@ -13,8 +13,8 @@ import {
     resultSwitchMap,
     tapResultErr,
     tapResultOk,
-} from '../src/rxjs-operators';
-import { eq } from './util';
+} from '../src/rxjs-operators/index.js';
+import { eq } from './util.js';
 
 const goodVal: Observable<Result<string, number>> = of(Ok('good'));
 const badVal: Observable<Result<string, number>> = of(Err(0));
