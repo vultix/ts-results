@@ -30,6 +30,7 @@ can become obsolete.
     -   [Creation](#creation)
     -   [Type Safety](#type-safety)
     -   [Unwrap](#unwrap)
+    -   [UnwrapErr](#unwraperr)
     -   [Expect](#expect)
     -   [ExpectErr](#expecterr)
     -   [Map, MapErr](#map-and-maperr)
@@ -208,6 +209,17 @@ let badResult = new Err(new Error('something went wrong'));
 goodResult.unwrap(); // 1
 badResult.unwrap(); // throws Error("something went wrong")
 ```
+
+#### UnwrapErr
+
+```typescript
+let goodResult = new Ok(1);
+let badResult = new Err('something went wrong');
+
+goodResult.unwrapErr(); // throws an exception
+badResult.unwrapErr(); // returns 'something went wrong'
+```
+
 
 #### Expect
 

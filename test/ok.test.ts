@@ -72,6 +72,18 @@ test('unwrap', () => {
     eq<boolean, typeof val>(true);
 });
 
+test('unwrapErr', () => {
+    try {
+        const err = Ok('boom').unwrapErr();
+        expect_never(err, true);
+        throw new Error('Unreachable')
+    }
+    catch (e) {
+        expect((e as Error).message).toMatch('boom')
+        expect((e as Error).cause).toEqual('boom')
+    }
+});
+
 test('map', () => {
     const mapped = Ok(3).map((x) => x.toString(10));
     expect(mapped).toMatchResult(Ok('3'));
