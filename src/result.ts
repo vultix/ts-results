@@ -26,12 +26,6 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     expect(msg: string): T;
 
     /**
-     * Returns the contained `Ok` value, if does not exist.  Throws an error if it does.
-     * @param msg the message to throw if Ok value.
-     */
-    expectErr(msg: string): T;
-    
-    /**
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
      * Instead, prefer to handle the `Err` case explicitly.
@@ -142,10 +136,6 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`);
     }
 
-    expectErr(_msg: string): E {
-        return this.val
-    }
-
     unwrap(): never {
         throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`);
     }
@@ -228,10 +218,6 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     expect(_msg: string): T {
         return this.val;
-    }
-
-    expectErr(msg: string): never {
-        throw new Error(msg);
     }
 
     unwrap(): T {
