@@ -16,8 +16,8 @@ import { Option, None, Some } from './option';
  * pub fn unwrap_or_default(self) -> T
  */
 interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
-    /** `true` when the result is Ok */ readonly ok: boolean;
-    /** `true` when the result is Err */ readonly err: boolean;
+    isOk(): this is OkImpl<T>;
+    isErr(): this is ErrImpl<E>;
 
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
@@ -29,8 +29,8 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns the contained `Ok` value, if does not exist.  Throws an error if it does.
      * @param msg the message to throw if Ok value.
      */
-    expectErr(msg: string): T;
-    
+    expectErr(msg: string): E;
+
     /**
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
@@ -95,9 +95,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     /** An empty Err */
     static readonly EMPTY = new ErrImpl<void>(undefined);
 
-    readonly ok!: false;
-    readonly err!: true;
-    readonly val!: E;
+    readonly error: E;
 
     private readonly _stack!: string;
 
@@ -110,13 +108,11 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     constructor(val: E) {
+        this.error = val;
         if (!(this instanceof ErrImpl)) {
             return new ErrImpl(val);
         }
 
-        this.ok = false;
-        this.err = true;
-        this.val = val;
 
         const stackLines = new Error().stack!.split('\n').slice(2);
         if (stackLines && stackLines.length > 0 && stackLines[0].includes('ErrImpl')) {
@@ -124,6 +120,14 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         }
 
         this._stack = stackLines.join('\n');
+    }
+
+    isOk(): false {
+        return false;
+    }
+
+    isErr(): this is ErrImpl<E> {
+        return true;
     }
 
     /**
@@ -139,15 +143,15 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expect(msg: string): never {
-        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`);
+        throw new Error(`${msg} - Error: ${toString(this.error)}\n${this._stack}`);
     }
 
     expectErr(_msg: string): E {
-        return this.val
+        return this.error
     }
 
     unwrap(): never {
-        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`);
+        throw new Error(`Tried to unwrap Error: ${toString(this.error)}\n${this._stack}`);
     }
 
     map(_mapper: unknown): Err<E> {
@@ -159,7 +163,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
-        return new Err(mapper(this.val));
+        return new Err(mapper(this.error));
     }
 
     toOption(): Option<never> {
@@ -167,7 +171,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     toString(): string {
-        return `Err(${toString(this.val)})`;
+        return `Err(${toString(this.error)})`;
     }
 
     get stack(): string | undefined {
@@ -185,15 +189,13 @@ export type Err<E> = ErrImpl<E>;
 export class OkImpl<T> implements BaseResult<T, never> {
     static readonly EMPTY = new OkImpl<void>(undefined);
 
-    readonly ok!: true;
-    readonly err!: false;
-    readonly val!: T;
+    readonly value: T;
 
     /**
      * Helper function if you know you have an Ok<T> and T is iterable
      */
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
-        const obj = Object(this.val) as Iterable<any>;
+        const obj = Object(this.value) as Iterable<any>;
 
         return Symbol.iterator in obj
             ? obj[Symbol.iterator]()
@@ -205,13 +207,18 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     constructor(val: T) {
+        this.value = val;
         if (!(this instanceof OkImpl)) {
             return new OkImpl(val);
         }
+    }
 
-        this.ok = true;
-        this.err = false;
-        this.val = val;
+    isOk(): this is OkImpl<T> {
+        return true;
+    }
+
+    isErr(): false {
+        return false;
     }
 
     /**
@@ -219,15 +226,15 @@ export class OkImpl<T> implements BaseResult<T, never> {
      * @deprecated in favor of unwrapOr
      */
     else(_val: unknown): T {
-        return this.val;
+        return this.value;
     }
 
     unwrapOr(_val: unknown): T {
-        return this.val;
+        return this.value;
     }
 
     expect(_msg: string): T {
-        return this.val;
+        return this.value;
     }
 
     expectErr(msg: string): never {
@@ -235,18 +242,18 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     unwrap(): T {
-        return this.val;
+        return this.value;
     }
 
     map<T2>(mapper: (val: T) => T2): Ok<T2> {
-        return new Ok(mapper(this.val));
+        return new Ok(mapper(this.value));
     }
 
     andThen<T2>(mapper: (val: T) => Ok<T2>): Ok<T2>;
     andThen<E2>(mapper: (val: T) => Err<E2>): Result<T, E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
-        return mapper(this.val);
+        return mapper(this.value);
     }
 
     mapErr(_mapper: unknown): Ok<T> {
@@ -254,7 +261,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     toOption(): Option<T> {
-        return Some(this.val);
+        return Some(this.value);
     }
 
     /**
@@ -267,11 +274,11 @@ export class OkImpl<T> implements BaseResult<T, never> {
      * (this is the `into_ok()` in rust)
      */
     safeUnwrap(): T {
-        return this.val;
+        return this.value;
     }
 
     toString(): string {
-        return `Ok(${toString(this.val)})`;
+        return `Ok(${toString(this.value)})`;
     }
 }
 
@@ -301,8 +308,8 @@ export namespace Result {
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
         const okResult = [];
         for (let result of results) {
-            if (result.ok) {
-                okResult.push(result.val);
+            if (result.isOk()) {
+                okResult.push(result.value);
             } else {
                 return result as Err<ResultErrTypes<T>[number]>;
             }
@@ -322,10 +329,10 @@ export namespace Result {
 
         // short-circuits
         for (const result of results) {
-            if (result.ok) {
+            if (result.isOk()) {
                 return result as Ok<ResultOkTypes<T>[number]>;
             } else {
-                errResult.push(result.val);
+                errResult.push(result.error);
             }
         }
 

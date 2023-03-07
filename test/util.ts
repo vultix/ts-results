@@ -26,8 +26,8 @@ expect.extend({
         try {
             expect(received.ok).toBe(result.ok);
 
-            if (received.val !== result.val) {
-                expect(received.val).toMatchObject(result.val);
+            if (received.error !== result.error) {
+                expect(received.error).toMatchObject(result.error);
             }
         } catch (e) {
             pass = false;
@@ -35,8 +35,8 @@ expect.extend({
 
         const type = received.ok ? 'Ok' : 'Err';
         const expectedType = received.ok ? 'Ok' : 'Err';
-        const val = JSON.stringify(received.val);
-        const expectedVal = JSON.stringify(result.val);
+        const val = JSON.stringify(received.error);
+        const expectedVal = JSON.stringify(result.error);
 
         return {
             message: () => `expected ${type}(${val}) ${pass ? '' : 'not '}to equal ${expectedType}(${expectedVal})`,
@@ -52,8 +52,8 @@ expect.extend({
 
             expect(received?.ok).toBe(result.ok);
 
-            if (received?.val !== result.val) {
-                expect(received?.val).toMatchObject(result.val);
+            if (received?.error !== result.error) {
+                expect(received?.error).toMatchObject(result.error);
             }
         } catch (e) {
             pass = false;
@@ -61,8 +61,8 @@ expect.extend({
 
         const type = received?.ok ? 'Ok' : 'Err';
         const expectedType = received?.ok ? 'Ok' : 'Err';
-        const val = JSON.stringify(received?.val);
-        const expectedVal = JSON.stringify(result.val);
+        const val = JSON.stringify(received?.error);
+        const expectedVal = JSON.stringify(result.error);
 
         return {
             message: () => `expected ${type}(${val}) ${pass ? '' : 'not '}to equal ${expectedType}(${expectedVal})`,
