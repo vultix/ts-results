@@ -119,3 +119,34 @@ test('to result', () => {
 
     expect(result2).toMatchResult(Err('error'));
 });
+
+test('match', () => {
+    const option = Some(1) as Option<number>;
+    expect(
+        option.match({
+            Some: (v) => v,
+            None: () => 0,
+        }),
+    ).toBe(1);
+
+    expect(
+        option.match({
+            None: () => 0,
+            _: () => 2,
+        }),
+    ).toBe(2);
+});
+
+test('tap', () => {
+    const option = Some(1) as Option<number>;
+    const matched = jest.fn();
+    const unmatched = jest.fn();
+    option.tap({
+        Some: matched,
+    });
+    option.tap({
+        None: unmatched,
+    });
+    expect(matched).toHaveBeenCalled();
+    expect(unmatched).not.toHaveBeenCalled();
+});

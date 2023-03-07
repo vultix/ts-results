@@ -1,5 +1,6 @@
 import { toString } from './utils';
 import { Option, None, Some } from './option';
+import { Variant } from './variant';
 
 /*
  * Missing Rust Result type methods:
@@ -29,8 +30,8 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns the contained `Ok` value, if does not exist.  Throws an error if it does.
      * @param msg the message to throw if Ok value.
      */
-    expectErr(msg: string): T;
-    
+    expectErr(msg: string): E;
+
     /**
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
@@ -91,9 +92,9 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
 /**
  * Contains the error value
  */
-export class ErrImpl<E> implements BaseResult<never, E> {
+export class ErrImpl<T, E> extends Variant('Err')<[E]> implements BaseResult<T, E> {
     /** An empty Err */
-    static readonly EMPTY = new ErrImpl<void>(undefined);
+    static readonly EMPTY = new ErrImpl<never, void>(undefined);
 
     readonly ok!: false;
     readonly err!: true;
@@ -110,6 +111,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     constructor(val: E) {
+        super(val);
         if (!(this instanceof ErrImpl)) {
             return new ErrImpl(val);
         }
@@ -143,7 +145,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expectErr(_msg: string): E {
-        return this.val
+        return this.val;
     }
 
     unwrap(): never {
@@ -177,13 +179,13 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
 // This allows Err to be callable - possible because of the es5 compilation target
 export const Err = ErrImpl as typeof ErrImpl & (<E>(err: E) => Err<E>);
-export type Err<E> = ErrImpl<E>;
+export type Err<E> = ErrImpl<never, E>;
 
 /**
  * Contains the success value
  */
-export class OkImpl<T> implements BaseResult<T, never> {
-    static readonly EMPTY = new OkImpl<void>(undefined);
+export class OkImpl<T, E> extends Variant('Ok')<[T]> implements BaseResult<T, E> {
+    static readonly EMPTY = new OkImpl<void, never>(undefined);
 
     readonly ok!: true;
     readonly err!: false;
@@ -205,6 +207,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     constructor(val: T) {
+        super(val);
         if (!(this instanceof OkImpl)) {
             return new OkImpl(val);
         }
@@ -277,7 +280,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
 // This allows Ok to be callable - possible because of the es5 compilation target
 export const Ok = OkImpl as typeof OkImpl & (<T>(val: T) => Ok<T>);
-export type Ok<T> = OkImpl<T>;
+export type Ok<T> = OkImpl<T, never>;
 
 export type Result<T, E> = Ok<T> | Err<E>;
 
@@ -341,7 +344,7 @@ export namespace Result {
         try {
             return new Ok(op());
         } catch (e) {
-            return new Err<E>(e as E);
+            return new Err<never, E>(e as E);
         }
     }
 

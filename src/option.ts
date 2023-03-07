@@ -1,5 +1,6 @@
 import { toString } from './utils';
 import { Result, Ok, Err } from './result';
+import { Variant } from './variant';
 
 interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the Option is Some */ readonly some: boolean;
@@ -50,7 +51,7 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
 /**
  * Contains the None value
  */
-class NoneImpl implements BaseOption<never> {
+class NoneImpl<T> extends Variant('None') implements BaseOption<T> {
     readonly some = false;
     readonly none = true;
 
@@ -92,14 +93,14 @@ class NoneImpl implements BaseOption<never> {
 }
 
 // Export None as a singleton, then freeze it so it can't be modified
-export const None = new NoneImpl();
-export type None = NoneImpl;
+export const None = new NoneImpl<never>();
+export type None = NoneImpl<never>;
 Object.freeze(None);
 
 /**
  * Contains the success value
  */
-class SomeImpl<T> implements BaseOption<T> {
+class SomeImpl<T> extends Variant('Some')<[T]> implements BaseOption<T> {
     static readonly EMPTY = new SomeImpl<void>(undefined);
 
     readonly some!: true;
@@ -122,6 +123,7 @@ class SomeImpl<T> implements BaseOption<T> {
     }
 
     constructor(val: T) {
+        super(val);
         if (!(this instanceof SomeImpl)) {
             return new SomeImpl(val);
         }
