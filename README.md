@@ -209,8 +209,8 @@ badResult.expect('badResult should be a number'); // throws Error("badResult sho
 let goodResult = Ok(1);
 let badResult = Err(new Error('something went wrong'));
 
-goodResult.expect('goodResult should not be a number'); // throws Error("goodResult should not be a number")
-badResult.expect('badResult should not be a number'); // new Error('something went wrong')
+goodResult.expectErr('goodResult should not be a number'); // throws Error("goodResult should not be a number")
+badResult.expectErr('badResult should not be a number'); // new Error('something went wrong')
 ```
 
 
