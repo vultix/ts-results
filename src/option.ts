@@ -57,6 +57,32 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
     mapOrElse<U>(default_: () => U, mapper: (val: T) => U): U;
 
     /**
+     * Returns `Some()` if we have a value, otherwise returns `other`.
+     * 
+     * `other` is evaluated eagerly. If `other` is a result of a function
+     * call try `or_else()` instead – it evaluates the parameter lazily.
+     * 
+     * @example
+     * 
+     * Some(1).or(Some(2)) // => Some(1)
+     * None.or(Some(2)) // => Some(2) 
+     */
+    or(other: Option<T>): Option<T>
+
+    /**
+     * Returns `Some()` if we have a value, otherwise returns the result
+     * of calling `other()`.
+     * 
+     * `other()` is called *only* when needed.
+     * 
+     * @example
+     * 
+     * Some(1).orElse(() => Some(2)) // => Some(1)
+     * None.orElse(() => Some(2)) // => Some(2) 
+     */
+    orElse(other: () => Option<T>): Option<T>
+
+    /**
      * Maps an `Option<T>` to a `Result<T, E>`.
      */
     toResult<E>(error: E): Result<T, E>;
@@ -99,6 +125,14 @@ class NoneImpl implements BaseOption<never> {
 
     mapOrElse<U>(default_: () => U, _mapper: unknown): U {
         return default_();
+    }
+
+    or<T>(other: Option<T>): Option<T> {
+        return other;
+    }
+
+    orElse<T>(other: () => Option<T>): Option<T> {
+        return other();
     }
 
     andThen<T2>(op: unknown): None {
@@ -176,6 +210,14 @@ class SomeImpl<T> implements BaseOption<T> {
 
     mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
         return mapper(this.val);
+    }
+
+    or(_other: Option<T>): Option<T> {
+        return this;
+    }
+
+    orElse(_other: () => Option<T>): Option<T> {
+        return this;
     }
 
     andThen<T2>(mapper: (val: T) => Option<T2>): Option<T2> {

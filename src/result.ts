@@ -6,8 +6,6 @@ import { Option, None, Some } from './option.js';
  * pub fn contains<U>(&self, x: &U) -> bool
  * pub fn contains_err<F>(&self, f: &F) -> bool
  * pub fn and<U>(self, res: Result<U, E>) -> Result<U, E>
- * pub fn or<F>(self, res: Result<T, F>) -> Result<T, F>
- * pub fn or_else<F, O>(self, op: O) -> Result<T, F>
  * pub fn unwrap_or_else<F>(self, op: F) -> T
  * pub fn expect_err(self, msg: &str) -> E
  * pub fn unwrap_or_default(self) -> T
@@ -101,6 +99,32 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * `Err`).
      */
     mapOrElse<U>(default_: () => U, mapper: (val: T) => U): U;
+
+    /**
+     * Returns `Ok()` if we have a value, otherwise returns `other`.
+     * 
+     * `other` is evaluated eagerly. If `other` is a result of a function
+     * call try `or_else()` instead – it evaluates the parameter lazily.
+     * 
+     * @example
+     * 
+     * Ok(1).or(Ok(2)) // => Ok(1)
+     * Err('error here').or(Ok(2)) // => Ok(2) 
+     */
+    or<E2>(other: Result<T, E2>): Result<T, E2>
+
+    /**
+     * Returns `Some()` if we have a value, otherwise returns the result
+     * of calling `other()`.
+     * 
+     * `other()` is called *only* when needed.
+     * 
+     * @example
+     * 
+     * Ok(1).orElse(() => Ok(2)) // => Ok(1)
+     * Err('error').orElse(() => Ok(2)) // => Ok(2) 
+     */
+    orElse<E2>(other: () => Result<T, E2>): Result<T, E2>
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -200,6 +224,14 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     mapOrElse<U>(default_: () => U, _mapper: unknown): U {
         return default_();
+    }
+
+    or<T, E2>(other: Result<T, E2>): Result<T, E2> {
+        return other;
+    }
+
+    orElse<T, E2>(other: () => Result<T, E2>): Result<T, E2> {
+        return other();
     }
 
     toOption(): Option<never> {
@@ -306,6 +338,14 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
         return mapper(this.val);
+    }
+
+    or<E2>(_other: Result<T, E2>): Result<T, E2> {
+        return this;
+    }
+
+    orElse<E2>(_other: () => Result<T, E2>): Result<T, E2> {
+        return this;
     }
 
     toOption(): Option<T> {

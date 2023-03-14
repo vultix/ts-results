@@ -127,3 +127,11 @@ test('to result', () => {
 
     expect(result2).toMatchResult(Err('error'));
 });
+
+test('or / orElse', () => {
+    expect(None.or(Some(1))).toEqual(Some(1))
+    expect(None.orElse(() => Some(1))).toEqual(Some(1))
+
+    expect(Some(1).or(Some(2))).toEqual(Some(1))
+    expect(Some(1).orElse(() => {throw new Error('Call unexpected')})).toEqual(Some(1))
+})

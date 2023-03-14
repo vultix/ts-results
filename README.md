@@ -14,8 +14,10 @@ available with some fixes.
 Notable changes compared to the original package:
 
 * Added ESM compatibility
-* `Option` gained extra methods: `mapOr()` and `mapOrElse()`
-* `Result` also gained extra methods: `mapOr()`, `mapOrElse()` and `expectErr()`
+* `Option` gained extra methods: `mapOr()`, `mapOrElse()`, `or()`,
+  `orElse()`
+* `Result` also gained extra methods: `mapOr()`, `mapOrElse()`,
+  `expectErr()`, `or()`, `orElse()`
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.
@@ -35,6 +37,7 @@ can become obsolete.
     -   [ExpectErr](#expecterr)
     -   [Map, MapErr](#map-and-maperr)
     -   [MapOr, MapOrElse](#mapor-and-maporelse)
+    -   [Or, OrElse](#or-and-orelse)
     -   [AndThen](#andthen)
     -   [Else](#else)
     -   [UnwrapOr](#unwrapor)
@@ -274,6 +277,22 @@ badResult.mapOr(0, (value) => -value) // 0
 // when it's necessary (if it performs some heavy computation for example).
 goodResult.mapOrElse(() => 0, (value) => -value) // -1
 badResult.mapOrElse(() => 0, (value) => -value) // 0
+```
+
+#### Or and OrElse
+
+```typescript
+let goodResult = Ok(1);
+let badResult = Err(new Error('something went wrong'));
+
+goodResult.or(Ok(2)) // 1
+badResult.or(Ok(2)) // 2
+
+// orElse() is useful when you only want to call a function to get the
+// value when it's necessary (if it performs some heavy computation
+// for example).
+goodResult.orElse(() => Ok(2)) // 1, the function is *not* called.
+badResult.orElse(() => Ok(2)) // 2
 ```
 
 #### andThen

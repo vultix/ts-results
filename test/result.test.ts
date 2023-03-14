@@ -247,3 +247,11 @@ test('To option', () => {
     const option2 = result2.toOption();
     expect(option2).toEqual(None);
 });
+
+test('or / orElse', () => {
+    expect(Err('error').or(Ok(1))).toEqual(Ok(1))
+    expect(Err('error').orElse(() => Ok(1))).toEqual(Ok(1))
+
+    expect(Ok(1).or(Ok(2))).toEqual(Ok(1))
+    expect(Ok(1).orElse(() => {throw new Error('Call unexpected')})).toEqual(Ok(1))
+})
