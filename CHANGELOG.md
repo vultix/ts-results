@@ -1,3 +1,7 @@
+# 3.6.0
+
+- Added `or()` and `orElse()` methods to both `Option` and `Result`
+
 # 3.5.0
 
 - Added `andThen()` documentation, thanks to Drew De Ponte
