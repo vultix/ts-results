@@ -40,11 +40,6 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
      * This function can be used to compose the Options of two functions.
      */
     map<U>(mapper: (val: T) => U): Option<U>;
-
-    /**
-     * Maps an `Option<T>` to a `Result<T, E>`.
-     */
-    toResult<E>(error: E): Result<T, E>;
 }
 
 /**
@@ -80,10 +75,6 @@ class NoneImpl implements BaseOption<never> {
 
     andThen<T2>(op: unknown): None {
         return this;
-    }
-
-    toResult<E>(error: E): Err<E> {
-        return Err(error);
     }
 
     toString(): string {
@@ -149,10 +140,6 @@ class SomeImpl<T> implements BaseOption<T> {
 
     andThen<T2>(mapper: (val: T) => Option<T2>): Option<T2> {
         return mapper(this.val);
-    }
-
-    toResult<E>(error: E): Ok<T> {
-        return Ok(this.val);
     }
 
     /**
