@@ -16,6 +16,12 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
 
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
+     *
+     * If you know you're dealing with `Ok` and the compiler knows it too (because you tested
+     * `ok` or `err`) you should use `val` instead. While `Ok`'s `expect()` and `val` will
+     * both return the same value using `val` is preferable because it makes it clear that
+     * there won't be an exception thrown on access.
+     *
      * @param msg the message to throw if no Ok value.
      */
     expect(msg: string): T;
@@ -30,6 +36,11 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
      * Instead, prefer to handle the `Err` case explicitly.
+     *
+     * If you know you're dealing with `Ok` and the compiler knows it too (because you tested
+     * `ok` or `err`) you should use `val` instead. While `Ok`'s `unwrap()` and `val` will
+     * both return the same value using `val` is preferable because it makes it clear that
+     * there won't be an exception thrown on access.
      *
      * Throws if the value is an `Err`, with a message provided by the `Err`'s value.
      */
