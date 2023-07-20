@@ -15,9 +15,26 @@
     "type": "git",
     "url": "https://github.com/lune-climate/ts-results-es.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "Rust",
+    "Result",
+    "Results",
+    "Option",
+    "Options",
+    "Typescript",
+    "TS",
+    "Ok",
+    "Err",
+    "Some",
+    "None",
+    "Typed Errors",
+    "Error Handling",
+    "Monad",
+    "Maybe",
+    "Union"
+  ],
+  "author": "Vultix",
+  "license": "MIT",
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "conditional-type-checks": "^1.0.5",
@@ -28,5 +45,6 @@
     "ts-jest": "^26.5.4",
     "tslib": "^2.3.1",
     "typescript": "^4.6.3"
-  }
+  },
+  "readme": "README.md"
 }
