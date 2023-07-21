@@ -2,7 +2,6 @@
   "name": "ts-results-es",
   "version": "3.6.1",
   "description": "A typescript implementation of Rust's Result and Option objects.",
-  "private": true,
   "scripts": {
     "build": "npm run clean && npm run build:ts && npm run build:copy",
     "build:ts": "tsc -p tsconfig-cjs.json && tsc -p tsconfig-esm.json",
