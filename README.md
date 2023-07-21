@@ -567,5 +567,5 @@ Steps to publish:
 2. Update the CHANGELOG
 3. Commit to Git in a single commit and add a tag: `git tag -a vX.X.X` (the tag description can be
    anything)
-4. `npm run build && cd dist && npm publish`
+4. `npm run build && npm publish`
 5. Push both the `master` branch and the new tag to GitHub

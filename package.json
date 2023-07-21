@@ -6,10 +6,19 @@
   "scripts": {
     "build": "npm run clean && npm run build:ts && npm run build:copy",
     "build:ts": "tsc -p tsconfig-cjs.json && tsc -p tsconfig-esm.json",
-    "build:copy": "copyfiles README.md LICENSE src/package.json dist --flat && copyfiles src/rxjs-operators/package.json dist/cjs --up 1 && cp package-cjs.json dist/cjs/package.json && cp package-esm.json dist/esm/package.json",
+    "build:copy": "copyfiles src/rxjs-operators/package.json dist/cjs --up 1 && cp package-cjs.json dist/cjs/package.json && cp package-esm.json dist/esm/package.json",
     "clean": "rm -rf dist",
     "test": "jest",
     "format": "prettier . --write"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "exports": {
+      ".": {
+          "import": "./dist/esm/index.js",
+          "require": "./dist/cjs/index.js"
+      }
   },
   "repository": {
     "type": "git",
