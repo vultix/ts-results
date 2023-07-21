@@ -1,3 +1,8 @@
+# 3.6.1
+
+- Improved the documentation a little bit
+- Fixed rxjs-operators module imports, thanks to Jacob Nguyen
+
 # 3.6.0
 
 - Added `or()` and `orElse()` methods to both `Option` and `Result`
