@@ -25,9 +25,16 @@ expect.extend({
         let pass = true;
         try {
             expect(received.ok).toBe(result.ok);
-
-            if (received.val !== result.val) {
-                expect(received.val).toMatchObject(result.val);
+            if (received.ok && result.ok) {
+                if (received.okVal !== result.okVal) {
+                    expect(received.okVal).toMatchObject(result.okVal);
+                }
+            } else if (received.err && result.err) {
+                if (received.errVal !== result.errVal) {
+                    expect(received.errVal).toMatchObject(result.errVal);
+                }
+            } else {
+                pass = false;
             }
         } catch (e) {
             pass = false;
@@ -35,8 +42,8 @@ expect.extend({
 
         const type = received.ok ? 'Ok' : 'Err';
         const expectedType = received.ok ? 'Ok' : 'Err';
-        const val = JSON.stringify(received.val);
-        const expectedVal = JSON.stringify(result.val);
+        const val = received.ok ? JSON.stringify(received.okVal) : JSON.stringify(received.errVal);
+        const expectedVal =  result.ok ? JSON.stringify(result.okVal): JSON.stringify(result.errVal);
 
         return {
             message: () => `expected ${type}(${val}) ${pass ? '' : 'not '}to equal ${expectedType}(${expectedVal})`,
@@ -51,18 +58,27 @@ expect.extend({
             obs.subscribe((val) => (received = val)).unsubscribe();
 
             expect(received?.ok).toBe(result.ok);
-
-            if (received?.val !== result.val) {
-                expect(received?.val).toMatchObject(result.val);
+            if (received && received.ok && result.ok) {
+                if (received.okVal !== result.okVal) {
+                    expect(received.okVal).toMatchObject(result.okVal);
+                }
+            } else if (received && received.err && result.err) {
+                if (received.errVal !== result.errVal) {
+                    expect(received.errVal).toMatchObject(result.errVal);
+                }
+            } else {
+                pass = false;
             }
+
+
         } catch (e) {
             pass = false;
         }
 
         const type = received?.ok ? 'Ok' : 'Err';
         const expectedType = received?.ok ? 'Ok' : 'Err';
-        const val = JSON.stringify(received?.val);
-        const expectedVal = JSON.stringify(result.val);
+        const val = received?.ok ? JSON.stringify(received.okVal) : JSON.stringify(received?.errVal);
+        const expectedVal =  result.ok ? JSON.stringify(result.okVal): JSON.stringify(result.errVal);
 
         return {
             message: () => `expected ${type}(${val}) ${pass ? '' : 'not '}to equal ${expectedType}(${expectedVal})`,
