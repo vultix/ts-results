@@ -30,7 +30,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * @param msg the message to throw if Ok value.
      */
     expectErr(msg: string): E;
-    
+
     /**
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
@@ -143,7 +143,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expectErr(_msg: string): E {
-        return this.val
+        return this.val;
     }
 
     unwrap(): never {
@@ -337,12 +337,7 @@ export namespace Result {
      * Wrap an operation that may throw an Error (`try-catch` style) into checked exception style
      * @param op The operation function
      */
-    export function wrap<
-        T, 
-        E = unknown
-    >(op: (...any : any[]) => T, ...params: Parameters<typeof op>) : 
-        Result<T, E>
-    {
+    export function wrap<T, E = unknown>(op: (...any: any[]) => T, ...params: Parameters<typeof op>): Result<T, E> {
         try {
             return new Ok(op());
         } catch (e) {
@@ -354,12 +349,10 @@ export namespace Result {
      * Wrap an async operation that may throw an Error (`try-catch` style) into checked exception style
      * @param op The operation function
      */
-    export function wrapAsync<
-        T, 
-        E = unknown
-    >(op: (...any : any[]) => Promise<T>, ...params: Parameters<typeof op>) : 
-        Promise<Result<T, E>>
-    {
+    export function wrapAsync<T, E = unknown>(
+        op: (...any: any[]) => Promise<T>,
+        ...params: Parameters<typeof op>
+    ): Promise<Result<T, E>> {
         try {
             return op()
                 .then((val: T) => new Ok(val))
