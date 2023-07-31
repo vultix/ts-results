@@ -339,7 +339,7 @@ export namespace Result {
      */
     export function wrap<T, E = unknown>(op: (...any: any[]) => T, ...params: Parameters<typeof op>): Result<T, E> {
         try {
-            return new Ok(op());
+            return new Ok(op(...params));
         } catch (e) {
             return new Err<E>(e as E);
         }
@@ -354,7 +354,7 @@ export namespace Result {
         ...params: Parameters<typeof op>
     ): Promise<Result<T, E>> {
         try {
-            return op()
+            return op(...params)
                 .then((val: T) => new Ok(val))
                 .catch((e: E) => new Err(e));
         } catch (e) {
