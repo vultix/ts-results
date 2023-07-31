@@ -154,7 +154,9 @@ let errorResult: Result<number, Error> = Err(new Error('bad number!'));
 ```
 
 #### Type Safety
+
 _Note: Typescript currently has a [bug](https://github.com/microsoft/TypeScript/issues/10564), making this type narrowing only work when `strictNullChecks` is turned on._
+
 ```typescript
 let result: Result<number, Error> = Ok(1);
 if (result.ok) {
@@ -212,7 +214,6 @@ let badResult = Err(new Error('something went wrong'));
 goodResult.expect('goodResult should not be a number'); // throws Error("goodResult should not be a number")
 badResult.expect('badResult should not be a number'); // new Error('something went wrong')
 ```
-
 
 #### Map and MapErr
 
