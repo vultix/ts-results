@@ -196,7 +196,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expect(msg: string): never {
-        // The cause casting required because of the current TS definition beign overly restrictive
+        // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
         // See https://github.com/microsoft/TypeScript/issues/45167
         throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
@@ -207,7 +207,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     unwrap(): never {
-        // The cause casting required because of the current TS definition beign overly restrictive
+        // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
         // See https://github.com/microsoft/TypeScript/issues/45167
         throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
@@ -322,7 +322,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     unwrapErr(): never {
-        // The cause casting required because of the current TS definition beign overly restrictive
+        // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
         // See https://github.com/microsoft/TypeScript/issues/45167
         throw new Error(`Tried to unwrap Ok: ${toString(this.val)}`, { cause: this.val as any });
