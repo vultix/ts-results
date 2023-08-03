@@ -17,6 +17,10 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
      *
+     * The thrown error's
+     * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
+     * is set to value contained in `Err`.
+     *
      * If you know you're dealing with `Ok` and the compiler knows it too (because you tested
      * `ok` or `err`) you should use `val` instead. While `Ok`'s `expect()` and `val` will
      * both return the same value using `val` is preferable because it makes it clear that
@@ -42,7 +46,9 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * both return the same value using `val` is preferable because it makes it clear that
      * there won't be an exception thrown on access.
      *
-     * Throws if the value is an `Err`, with a message provided by the `Err`'s value.
+     * Throws if the value is an `Err`, with a message provided by the `Err`'s value and
+     * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
+     * set to the value.
      */
     unwrap(): T;
 
@@ -51,7 +57,9 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Because this function may throw, its use is generally discouraged.
      * Instead, prefer to handle the `Ok` case explicitly.
      *
-     * Throws if the value is an `Ok`, with a message provided by the `Ok`'s value.
+     * Throws if the value is an `Ok`, with a message provided by the `Ok`'s value and
+     * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
+     * set to the value.
      */
     unwrapErr(): E;
 
