@@ -43,7 +43,7 @@ test('static EMPTY', () => {
     eq<typeof Ok.EMPTY, Ok<void>>(true);
 });
 
-test('else, unwrapOr', () => {
+test('else, unwrapOr, unwrapOrElse', () => {
     const e1 = Ok(3).else(false);
     expect(e1).toBe(3);
     eq<number, typeof e1>(true);
@@ -51,6 +51,10 @@ test('else, unwrapOr', () => {
     const e2 = Ok(3).unwrapOr(false);
     expect(e2).toBe(3);
     eq<number, typeof e2>(true);
+
+    const e3 = Ok(3).unwrapOrElse((e: unknown) => `e${e}`);
+    expect(e3).toBe(3);
+    eq<number, typeof e3>(true);
 });
 
 test('expect', () => {

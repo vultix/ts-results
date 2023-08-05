@@ -21,6 +21,7 @@ Brings compile-time error checking and optional values to typescript.
     -   [andThen](#andthen)
     -   [Else](#else)
     -   [UnwrapOr](#unwrapor)
+    -   [UnwrapOrElse](#unwraporelse)
     -   [Empty](#empty)
     -   [Combining Results](#combining-results)
         -   [Result.all](#result-all)
@@ -269,6 +270,23 @@ let badResult = Err(new Error('something went wrong'));
 
 goodResult.unwrapOr(5); // 1
 badResult.unwrapOr(5); // 5
+```
+
+#### UnwrapOrElse
+
+```typescript
+let goodResult = Ok(5);
+let badResult = Err('invalid input');
+
+const r1 = goodResult.unwrapOrElse(e => { console.log(e); return 0});
+const r2 = badResult.unwrapOrElse(e => { console.log(e); return 0});
+console.log('--------')
+console.log(`r1 = ${r1}, r2 = ${r2}`)
+// All console log output:
+//
+// invalid input
+// --------
+// r1 = 5, r2 = 0
 ```
 
 #### Empty

@@ -42,7 +42,7 @@ test('static EMPTY', () => {
     eq<typeof Err.EMPTY, Err<void>>(true);
 });
 
-test('else, unwrapOr', () => {
+test('else, unwrapOr, unwrapOrElse', () => {
     const e1 = Err(3).else(false);
     expect(e1).toBe(false);
     eq<false, typeof e1>(true);
@@ -50,6 +50,10 @@ test('else, unwrapOr', () => {
     const e2 = Err(3).unwrapOr(false);
     expect(e2).toBe(false);
     eq<false, typeof e2>(true);
+
+    const e3 = Err(3).unwrapOrElse(e => `e${e}`);
+    expect(e3).toBe('e3');
+    eq<string, typeof e3>(true);
 });
 
 test('expect', () => {

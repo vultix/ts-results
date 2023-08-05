@@ -38,6 +38,23 @@ test('Type can be narrowed using ok & err', () => {
     }
 });
 
+test('unwrapOrElse', () => {
+    const rOk = new Ok(1) as Result<number, string>;
+    const rErr = new Err('err') as Result<number, string>;
+
+    // same types collapses
+    const u1Ok = rOk.unwrapOrElse(e => e.length);
+    const u1Err = rErr.unwrapOrElse(e => e.length);
+    eq<typeof u1Ok, typeof u1Err>(true);
+    eq<typeof u1Ok, number>(true);
+
+    // union types persists
+    const u2Ok = rOk.unwrapOrElse(e => e);
+    const u2Err = rErr.unwrapOrElse(e => e);
+    eq<typeof u2Ok, typeof u2Err>(true);
+    eq<typeof u2Ok, number | string>(true);
+});
+
 test('map', () => {
     const r = new Err(0) as Result<string, number>;
     const r2 = r.map(Symbol);
