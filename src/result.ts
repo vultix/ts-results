@@ -10,7 +10,6 @@ import { Option, None, Some } from './option';
  * pub fn and<U>(self, res: Result<U, E>) -> Result<U, E>
  * pub fn or<F>(self, res: Result<T, F>) -> Result<T, F>
  * pub fn or_else<F, O>(self, op: O) -> Result<T, F>
- * pub fn unwrap_or_else<F>(self, op: F) -> T
  * pub fn expect_err(self, msg: &str) -> E
  * pub fn unwrap_err(self) -> E
  * pub fn unwrap_or_default(self) -> T
@@ -54,6 +53,13 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      *  (This is the `unwrap_or` in rust)
      */
     unwrapOr<T2>(val: T2): T | T2;
+
+    /**
+     * Returns the contained `Ok` value or computes it from function.
+     *
+     *  (This is the `unwrap_or_else` in rust)
+     */
+    unwrapOrElse<T2>(mapper: (val: E) => T2): T | T2;
 
     /**
      * Calls `mapper` if the result is `Ok`, otherwise returns the `Err` value of self.
@@ -136,6 +142,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     unwrapOr<T2>(val: T2): T2 {
         return val;
+    }
+
+    unwrapOrElse<T2>(mapper: (val: E) => T2): T2 {
+        return mapper(this.val);
     }
 
     expect(msg: string): never {
@@ -223,6 +233,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     unwrapOr(_val: unknown): T {
+        return this.val;
+    }
+
+    unwrapOrElse(_mapper: unknown): T {
         return this.val;
     }
 
