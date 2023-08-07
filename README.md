@@ -275,8 +275,8 @@ badResult.mapOr(0, (value) => -value) // 0
 
 // mapOrElse() is useful when you only want to call the default function
 // when it's necessary (if it performs some heavy computation for example).
-goodResult.mapOrElse(() => 0, (value) => -value) // -1
-badResult.mapOrElse(() => 0, (value) => -value) // 0
+goodResult.mapOrElse((_error) => 0, (value) => -value) // -1
+badResult.mapOrElse((_error) => 0, (value) => -value) // 0
 ```
 
 #### Or and OrElse

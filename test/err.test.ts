@@ -108,7 +108,7 @@ test('mapErr', () => {
 
 test('mapOr / mapOrElse', () => {
     expect(Err('Some error').mapOr(1, () => -1)).toEqual(1)
-    expect(Err('Some error').mapOrElse(() => 1, () => -1)).toEqual(1)
+    expect(Err('Some error').mapOrElse((error) => error.length, () => -1)).toEqual(10)
 });
 
 test('iterable', () => {

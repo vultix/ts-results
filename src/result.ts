@@ -117,7 +117,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * (in case of `Ok`) or producing a default value using the `default` function (in case of
      * `Err`).
      */
-    mapOrElse<U>(default_: () => U, mapper: (val: T) => U): U;
+    mapOrElse<U>(default_: (error: E) => U, mapper: (val: T) => U): U;
 
     /**
      * Returns `Ok()` if we have a value, otherwise returns `other`.
@@ -241,8 +241,8 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return default_;
     }
 
-    mapOrElse<U>(default_: () => U, _mapper: unknown): U {
-        return default_();
+    mapOrElse<U>(default_: (error: E) => U, _mapper: unknown): U {
+        return default_(this.val);
     }
 
     or<T, E2>(other: Result<T, E2>): Result<T, E2> {
@@ -355,7 +355,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return mapper(this.val);
     }
 
-    mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
+    mapOrElse<U>(_default_: (_error: never) => U, mapper: (val: T) => U): U {
         return mapper(this.val);
     }
 
