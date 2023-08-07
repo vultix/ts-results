@@ -33,13 +33,13 @@ test('ok, err, and val', () => {
     expect(err.ok).toBe(true);
     assert<typeof err.ok>(true);
 
-    expect(err.val).toBe(32);
-    eq<typeof err.val, number>(true);
+    expect(err.value).toBe(32);
+    eq<typeof err.value, number>(true);
 });
 
 test('static EMPTY', () => {
     expect(Ok.EMPTY).toBeInstanceOf(Ok);
-    expect(Ok.EMPTY.val).toBe(undefined);
+    expect(Ok.EMPTY.value).toBe(undefined);
     eq<typeof Ok.EMPTY, Ok<void>>(true);
 });
 

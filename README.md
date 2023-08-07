@@ -18,6 +18,7 @@ Notable changes compared to the original package:
   `orElse()`
 * `Result` also gained extra methods: `mapOr()`, `mapOrElse()`,
   `expectErr()`, `or()`, `orElse()`
+* `Ok` and `Err` no longer have the `val` property – it's `Ok.value` and `Err.error` now
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.
@@ -108,10 +109,10 @@ function readFile(path: string): Result<string, 'invalid path'> {
 const result = readFile('test.txt');
 if (result.ok) {
     // text contains the file's content
-    const text = result.val;
+    const text = result.value;
 } else {
     // err equals 'invalid path'
-    const err = result.val;
+    const err = result.error;
 }
 ```
 
@@ -178,19 +179,19 @@ _Note: Typescript currently has a [bug](https://github.com/microsoft/TypeScript/
 ```typescript
 let result: Result<number, Error> = Ok(1);
 if (result.ok) {
-    // Typescript knows that result.val is a number because result.ok was true
-    let number = result.val + 1;
+    // Typescript knows that result.value is a number because result.ok was true
+    let number = result.value + 1;
 } else {
-    // Typescript knows that result.val is an `Error` because result.ok was false
-    console.error(result.val.message);
+    // Typescript knows that result.error is an `Error` because result.ok was false
+    console.error(result.error.message);
 }
 
 if (result.err) {
-    // Typescript knows that result.val is an `Error` because result.err was true
-    console.error(result.val.message);
+    // Typescript knows that result.error is an `Error` because result.err was true
+    console.error(result.error.message);
 } else {
-    // Typescript knows that result.val is a number because result.err was false
-    let number = result.val + 1;
+    // Typescript knows that result.value is a number because result.err was false
+    let number = result.value + 1;
 }
 ```
 
@@ -396,9 +397,9 @@ const greaterThanZero = obs$.pipe(
 
 greaterThanZero.subscribe((result) => {
     if (result.ok) {
-        console.log('Was greater than zero: ' + result.val);
+        console.log('Was greater than zero: ' + result.value);
     } else {
-        console.log('Got Error Message: ' + result.val);
+        console.log('Got Error Message: ' + result.error);
     }
 });
 
@@ -502,9 +503,9 @@ const test$ = obs$.pipe(
 
 test$.subscribe((result) => {
     if (result.ok) {
-        console.log('Got string: ' + result.val);
+        console.log('Got string: ' + result.value);
     } else {
-        console.log('Got error: ' + result.val.message);
+        console.log('Got error: ' + result.error.message);
     }
 });
 

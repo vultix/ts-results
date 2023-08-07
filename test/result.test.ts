@@ -115,7 +115,7 @@ test('Result.all', () => {
     eq<typeof all1, Result<[number, boolean], never>>(true);
 
     const all3 = Result.all(err0, err1);
-    expect(all3).toMatchResult(Err(err0.val));
+    expect(all3).toMatchResult(Err(err0.error));
     eq<typeof all3, Result<[never, never], symbol | Error>>(true);
 
     const all4 = Result.all(...([] as Result<string, number>[]));
@@ -143,7 +143,7 @@ test('Result.any', () => {
     eq<typeof any1, Result<number | boolean, [never, never]>>(true);
 
     const any3 = Result.any(err0, err1);
-    expect(any3).toMatchResult(Err([err0.val, err1.val]));
+    expect(any3).toMatchResult(Err([err0.error, err1.error]));
     eq<typeof any3, Result<never, [symbol, Error]>>(true);
 
     const any4 = Result.any(...([] as Result<string, number>[]));
