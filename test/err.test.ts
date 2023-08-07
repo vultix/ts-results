@@ -26,11 +26,9 @@ test('Constructable & Callable', () => {
 
 test('ok, err, and val', () => {
     const err = new Err(32);
-    expect(err.err).toBe(true);
-    assert<typeof err.err>(true);
+    expect(err.isErr()).toBe(true);
 
-    expect(err.ok).toBe(false);
-    assert<typeof err.ok>(false);
+    expect(err.isOk()).toBe(false);
 
     expect(err.error).toBe(32);
     eq<typeof err.error, number>(true);

@@ -20,6 +20,11 @@ Notable changes compared to the original package:
   `expectErr()`, `or()`, `orElse()`
 * `Ok` and `Err` no longer have the `val` property – it's `Ok.value` and `Err.error` now
 * There is `Some.value` which replaced `Some.val`
+* Boolean flags were replaced with methods:
+  * `Option.some` -> `Option.isSome()`
+  * `Option.none` -> `Option.isNone()`
+  * `Result.ok` -> `Result.isOk()`
+  * `Result.err` -> `Result.isErr()`
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.
@@ -108,7 +113,7 @@ function readFile(path: string): Result<string, 'invalid path'> {
 
 // Typescript now forces you to check whether you have a valid result at compile time.
 const result = readFile('test.txt');
-if (result.ok) {
+if (result.isOk()) {
     // text contains the file's content
     const text = result.value;
 } else {
@@ -179,19 +184,19 @@ let errorResult: Result<number, Error> = Err(new Error('bad number!'));
 _Note: Typescript currently has a [bug](https://github.com/microsoft/TypeScript/issues/10564), making this type narrowing only work when `strictNullChecks` is turned on._
 ```typescript
 let result: Result<number, Error> = Ok(1);
-if (result.ok) {
-    // Typescript knows that result.value is a number because result.ok was true
+if (result.isOk()) {
+    // Typescript knows that result.value is a number because result.isOk() was true
     let number = result.value + 1;
 } else {
-    // Typescript knows that result.error is an `Error` because result.ok was false
+    // Typescript knows that result.error is an `Error` because result.isOk() was false
     console.error(result.error.message);
 }
 
-if (result.err) {
-    // Typescript knows that result.error is an `Error` because result.err was true
+if (result.isErr()) {
+    // Typescript knows that result.error is an `Error` because result.isErr() was true
     console.error(result.error.message);
 } else {
-    // Typescript knows that result.value is a number because result.err was false
+    // Typescript knows that result.value is a number because result.isErr() was false
     let number = result.value + 1;
 }
 ```
@@ -397,7 +402,7 @@ const greaterThanZero = obs$.pipe(
 ); // Has type Observable<Result<boolean, 'uh oh'>>
 
 greaterThanZero.subscribe((result) => {
-    if (result.ok) {
+    if (result.isOk()) {
         console.log('Was greater than zero: ' + result.value);
     } else {
         console.log('Got Error Message: ' + result.error);
@@ -503,7 +508,7 @@ const test$ = obs$.pipe(
 ); // Has type Observable<Result<string, CustomError | Error>>
 
 test$.subscribe((result) => {
-    if (result.ok) {
+    if (result.isOk()) {
         console.log('Got string: ' + result.value);
     } else {
         console.log('Got error: ' + result.error.message);

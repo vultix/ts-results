@@ -26,7 +26,7 @@ expect.extend({
         const receivedInner = 'value' in received ? received.value : received.error
         const resultInner = 'value' in result ? result.value : result.error
         try {
-            expect(received.ok).toBe(result.ok);
+            expect(received.isOk()).toBe(result.isOk());
 
             if (receivedInner !== resultInner) {
                 expect(receivedInner).toMatchObject(resultInner);
@@ -35,8 +35,8 @@ expect.extend({
             pass = false;
         }
 
-        const type = received.ok ? 'Ok' : 'Err';
-        const expectedType = received.ok ? 'Ok' : 'Err';
+        const type = received.isOk() ? 'Ok' : 'Err';
+        const expectedType = received.isOk() ? 'Ok' : 'Err';
         const val = JSON.stringify(receivedInner);
         const expectedVal = JSON.stringify(resultInner);
 
@@ -54,7 +54,7 @@ expect.extend({
         try {
             obs.subscribe((val) => {received = val; receivedInner = 'value' in received ? received.value : received.error}).unsubscribe();
 
-            expect(received?.ok).toBe(result.ok);
+            expect(received?.isOk()).toBe(result.isOk());
 
             if (receivedInner !== resultInner) {
                 expect(receivedInner).toMatchObject(resultInner);
@@ -63,8 +63,8 @@ expect.extend({
             pass = false;
         }
 
-        const type = received?.ok ? 'Ok' : 'Err';
-        const expectedType = received?.ok ? 'Ok' : 'Err';
+        const type = received?.isOk() ? 'Ok' : 'Err';
+        const expectedType = received?.isOk() ? 'Ok' : 'Err';
         const val = JSON.stringify(receivedInner);
         const expectedVal = JSON.stringify(resultInner);
 

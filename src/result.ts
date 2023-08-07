@@ -11,8 +11,11 @@ import { Option, None, Some } from './option.js';
  * pub fn unwrap_or_default(self) -> T
  */
 interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
-    /** `true` when the result is Ok */ readonly ok: boolean;
-    /** `true` when the result is Err */ readonly err: boolean;
+    /** `true` when the result is Ok */
+    isOk(): this is OkImpl<T>
+
+    /** `true` when the result is Err */
+    isErr(): this is ErrImpl<E>
 
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
@@ -160,8 +163,14 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     /** An empty Err */
     static readonly EMPTY = new ErrImpl<void>(undefined);
 
-    readonly ok!: false;
-    readonly err!: true;
+    isOk(): this is OkImpl<never> {
+        return false
+    }
+
+    isErr(): this is ErrImpl<E> {
+        return true
+    }
+
     readonly error!: E;
 
     private readonly _stack!: string;
@@ -179,8 +188,6 @@ export class ErrImpl<E> implements BaseResult<never, E> {
             return new ErrImpl(val);
         }
 
-        this.ok = false;
-        this.err = true;
         this.error = val;
 
         const stackLines = new Error().stack!.split('\n').slice(2);
@@ -276,8 +283,14 @@ export type Err<E> = ErrImpl<E>;
 export class OkImpl<T> implements BaseResult<T, never> {
     static readonly EMPTY = new OkImpl<void>(undefined);
 
-    readonly ok!: true;
-    readonly err!: false;
+    isOk(): this is OkImpl<T> {
+        return true
+    }
+
+    isErr(): this is ErrImpl<never> {
+        return false
+    }
+
     readonly value!: T;
 
     /**
@@ -300,8 +313,6 @@ export class OkImpl<T> implements BaseResult<T, never> {
             return new OkImpl(val);
         }
 
-        this.ok = true;
-        this.err = false;
         this.value = val;
     }
 
@@ -415,7 +426,7 @@ export namespace Result {
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
         const okResult = [];
         for (let result of results) {
-            if (result.ok) {
+            if (result.isOk()) {
                 okResult.push(result.value);
             } else {
                 return result as Err<ResultErrTypes<T>[number]>;
@@ -436,7 +447,7 @@ export namespace Result {
 
         // short-circuits
         for (const result of results) {
-            if (result.ok) {
+            if (result.isOk()) {
                 return result as Ok<ResultOkTypes<T>[number]>;
             } else {
                 errResult.push(result.error);

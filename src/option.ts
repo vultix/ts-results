@@ -2,8 +2,11 @@ import { toString } from './utils.js';
 import { Result, Ok, Err } from './result.js';
 
 interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
-    /** `true` when the Option is Some */ readonly some: boolean;
-    /** `true` when the Option is None */ readonly none: boolean;
+    /** `true` when the Option is Some */
+    isSome(): this is SomeImpl<T>
+
+    /** `true` when the Option is None */
+    isNone(): this is None
 
     /**
      * Returns the contained `Some` value, if exists.  Throws an error if not.
@@ -103,8 +106,13 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
  * Contains the None value
  */
 class NoneImpl implements BaseOption<never> {
-    readonly some = false;
-    readonly none = true;
+    isSome(): this is SomeImpl<never> {
+        return false
+    }
+
+    isNone(): this is NoneImpl {
+        return true;
+    }
 
     [Symbol.iterator](): Iterator<never, never, any> {
         return {
@@ -170,8 +178,14 @@ Object.freeze(None);
 class SomeImpl<T> implements BaseOption<T> {
     static readonly EMPTY = new SomeImpl<void>(undefined);
 
-    readonly some!: true;
-    readonly none!: false;
+    isSome(): this is SomeImpl<T> {
+        return true
+    }
+
+    isNone(): this is NoneImpl {
+        return false;
+    }
+
     readonly value!: T;
 
     /**
@@ -194,8 +208,6 @@ class SomeImpl<T> implements BaseOption<T> {
             return new SomeImpl(val);
         }
 
-        this.some = true;
-        this.none = false;
         this.value = val;
     }
 
@@ -277,7 +289,7 @@ export namespace Option {
     export function all<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>> {
         const someOption = [];
         for (let option of options) {
-            if (option.some) {
+            if (option.isSome()) {
                 someOption.push(option.value);
             } else {
                 return option as None;
@@ -294,7 +306,7 @@ export namespace Option {
     export function any<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>[number]> {
         // short-circuits
         for (const option of options) {
-            if (option.some) {
+            if (option.isSome()) {
                 return option as Some<OptionSomeTypes<T>[number]>;
             } else {
                 return option as None;

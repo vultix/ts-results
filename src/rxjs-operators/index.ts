@@ -30,7 +30,7 @@ export function elseMap<T, E, E2>(mapper: (val: E) => E2): OperatorFunction<Resu
     return (source) => {
         return source.pipe(
             map((result) => {
-                if (result.err) {
+                if (result.isErr()) {
                     return mapper(result.error);
                 } else {
                     return result.value;
@@ -44,7 +44,7 @@ export function elseMapTo<T, E, E2>(value: E2): OperatorFunction<Result<T, E>, T
     return (source) => {
         return source.pipe(
             map((result) => {
-                if (result.err) {
+                if (result.isErr()) {
                     return value;
                 } else {
                     return result.value;
@@ -66,7 +66,7 @@ export function resultSwitchMap<T, E, T2, E2>(
     return (source) => {
         return source.pipe(
             switchMap((result) => {
-                if (result.ok) {
+                if (result.isOk()) {
                     return mapper(result.value);
                 } else {
                     return of(result);
@@ -95,7 +95,7 @@ export function resultMergeMap<T, E, T2, E2>(
     return (source) => {
         return source.pipe(
             mergeMap((result) => {
-                if (result.ok) {
+                if (result.isOk()) {
                     return mapper(result.value);
                 } else {
                     return of(result);
@@ -115,7 +115,7 @@ export function resultMergeMap<T, E, T2, E2>(
 export function filterResultOk<T, E>(): OperatorFunction<Result<T, E>, T> {
     return (source) => {
         return source.pipe(
-            filter((result): result is Ok<T> => result.ok),
+            filter((result): result is Ok<T> => result.isOk()),
             map((result) => result.value),
         );
     };
@@ -124,7 +124,7 @@ export function filterResultOk<T, E>(): OperatorFunction<Result<T, E>, T> {
 export function filterResultErr<T, E>(): OperatorFunction<Result<T, E>, E> {
     return (source) => {
         return source.pipe(
-            filter((result): result is Err<E> => result.err),
+            filter((result): result is Err<E> => result.isErr()),
             map((result) => result.error),
         );
     };
@@ -134,7 +134,7 @@ export function tapResultErr<T, E>(tapFn: (err: E) => void): MonoTypeOperatorFun
     return (source: Observable<Result<T, E>>) => {
         return source.pipe(
             tap((r) => {
-                if (!r.ok) {
+                if (!r.isOk()) {
                     tapFn(r.error);
                 }
             }),
@@ -146,7 +146,7 @@ export function tapResultOk<T, E>(tapFn: (val: T) => void): MonoTypeOperatorFunc
     return (source: Observable<Result<T, E>>) => {
         return source.pipe(
             tap((r) => {
-                if (r.ok) {
+                if (r.isOk()) {
                     tapFn(r.value);
                 }
             }),

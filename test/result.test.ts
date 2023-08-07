@@ -25,13 +25,13 @@ test('Err<E> | Ok<T> should be Result<T, E>', () => {
 
 test('Type can be narrowed using ok & err', () => {
     const r1 = Ok(0) as Result<number, string>;
-    if (r1.ok) {
+    if (r1.isOk()) {
         eq<Ok<number>, typeof r1>(true);
     } else {
         eq<Err<string>, typeof r1>(true);
     }
 
-    if (r1.err) {
+    if (r1.isErr()) {
         eq<Err<string>, typeof r1>(true);
     } else {
         eq<Ok<number>, typeof r1>(true);
@@ -212,7 +212,7 @@ test('safeUnwrap', () => {
     // @ts-expect-error
     result.safeUnwrap();
 
-    if (result.ok) {
+    if (result.isOk()) {
         const val = result.safeUnwrap();
         eq<typeof val, number>(true);
         expect(val).toEqual(1);
