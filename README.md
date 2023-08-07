@@ -19,6 +19,7 @@ Notable changes compared to the original package:
 * `Result` also gained extra methods: `mapOr()`, `mapOrElse()`,
   `expectErr()`, `or()`, `orElse()`
 * `Ok` and `Err` no longer have the `val` property – it's `Ok.value` and `Err.error` now
+* There is `Some.value` which replaced `Some.val`
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.
@@ -157,7 +158,7 @@ console.log(optionalUrl); // Some(URL('...'))
 
 // To extract the value, do this:
 if (optionalUrl.some) {
-    const url: URL = optionalUrl.val;
+    const url: URL = optionalUrl.value;
 }
 ```
 

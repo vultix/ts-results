@@ -172,13 +172,13 @@ class SomeImpl<T> implements BaseOption<T> {
 
     readonly some!: true;
     readonly none!: false;
-    readonly val!: T;
+    readonly value!: T;
 
     /**
      * Helper function if you know you have an Some<T> and T is iterable
      */
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
-        const obj = Object(this.val) as Iterable<any>;
+        const obj = Object(this.value) as Iterable<any>;
 
         return Symbol.iterator in obj
             ? obj[Symbol.iterator]()
@@ -196,31 +196,31 @@ class SomeImpl<T> implements BaseOption<T> {
 
         this.some = true;
         this.none = false;
-        this.val = val;
+        this.value = val;
     }
 
     unwrapOr(_val: unknown): T {
-        return this.val;
+        return this.value;
     }
 
     expect(_msg: string): T {
-        return this.val;
+        return this.value;
     }
 
     unwrap(): T {
-        return this.val;
+        return this.value;
     }
 
     map<T2>(mapper: (val: T) => T2): Some<T2> {
-        return Some(mapper(this.val));
+        return Some(mapper(this.value));
     }
 
     mapOr<T2>(_default_: T2, mapper: (val: T) => T2): T2 {
-        return mapper(this.val);
+        return mapper(this.value);
     }
 
     mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
-        return mapper(this.val);
+        return mapper(this.value);
     }
 
     or(_other: Option<T>): Option<T> {
@@ -232,11 +232,11 @@ class SomeImpl<T> implements BaseOption<T> {
     }
 
     andThen<T2>(mapper: (val: T) => Option<T2>): Option<T2> {
-        return mapper(this.val);
+        return mapper(this.value);
     }
 
     toResult<E>(error: E): Ok<T> {
-        return Ok(this.val);
+        return Ok(this.value);
     }
 
     /**
@@ -249,11 +249,11 @@ class SomeImpl<T> implements BaseOption<T> {
      * (this is the `into_Some()` in rust)
      */
     safeUnwrap(): T {
-        return this.val;
+        return this.value;
     }
 
     toString(): string {
-        return `Some(${toString(this.val)})`;
+        return `Some(${toString(this.value)})`;
     }
 }
 
@@ -278,7 +278,7 @@ export namespace Option {
         const someOption = [];
         for (let option of options) {
             if (option.some) {
-                someOption.push(option.val);
+                someOption.push(option.value);
             } else {
                 return option as None;
             }

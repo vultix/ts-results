@@ -8,8 +8,8 @@ test('basic invariants', () => {
     expect(someString.some).toBeTruthy();
     expect(someNum.some).toBeTruthy();
     expect(None).toBe(None);
-    expect(someString.val).toBe('foo');
-    expect(someNum.val).toBe(10);
+    expect(someString.value).toBe('foo');
+    expect(someNum.value).toBe(10);
 
     expect(Option.isOption(someString)).toBe(true);
     expect(Option.isOption(someNum)).toBe(true);
@@ -21,7 +21,7 @@ test('type narrowing', () => {
     const opt = None as Option<string>;
     if (opt.some) {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     } else {
         eq<typeof opt, None>(true);
     }
@@ -30,19 +30,19 @@ test('type narrowing', () => {
         eq<typeof opt, None>(true);
     } else {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     }
 
     if (opt.none) {
         eq<typeof opt, None>(true);
     } else {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     }
 
     if (!opt.none) {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     } else {
         eq<typeof opt, None>(true);
     }
