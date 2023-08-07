@@ -136,14 +136,14 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns `Some()` if we have a value, otherwise returns the result
      * of calling `other()`.
      * 
-     * `other()` is called *only* when needed.
+     * `other()` is called *only* when needed and is passed the error value in a parameter.
      * 
      * @example
      * 
      * Ok(1).orElse(() => Ok(2)) // => Ok(1)
      * Err('error').orElse(() => Ok(2)) // => Ok(2) 
      */
-    orElse<E2>(other: () => Result<T, E2>): Result<T, E2>
+    orElse<E2>(other: (error: E) => Result<T, E2>): Result<T, E2>
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -249,8 +249,8 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return other;
     }
 
-    orElse<T, E2>(other: () => Result<T, E2>): Result<T, E2> {
-        return other();
+    orElse<T, E2>(other: (error: E) => Result<T, E2>): Result<T, E2> {
+        return other(this.val);
     }
 
     toOption(): Option<never> {
@@ -363,7 +363,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return this;
     }
 
-    orElse<E2>(_other: () => Result<T, E2>): Result<T, E2> {
+    orElse<E2>(_other: (error: never) => Result<T, E2>): Result<T, E2> {
         return this;
     }
 

@@ -291,8 +291,8 @@ badResult.or(Ok(2)) // 2
 // orElse() is useful when you only want to call a function to get the
 // value when it's necessary (if it performs some heavy computation
 // for example).
-goodResult.orElse(() => Ok(2)) // 1, the function is *not* called.
-badResult.orElse(() => Ok(2)) // 2
+goodResult.orElse((_error) => Ok(2)) // 1, the function is *not* called.
+badResult.orElse((_error) => Ok(2)) // 2
 ```
 
 #### andThen
