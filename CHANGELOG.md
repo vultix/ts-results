@@ -1,3 +1,20 @@
+# 4.0.0
+
+- Improved the documentation
+- Fixed the rxjs-operators submodules type declarations for CommonJS code
+- Changed `Result.orElse()` and `Result.mapOrElse()` error-handling callback to take
+  the error as an argument (consistent with the original Rust methods)
+
+Backwards incompatible:
+
+- A bunch of renames:
+  - `Some.val` -> `Some.value`
+  - `Result.val` -> `Ok.value` and `Err.error`
+  - `Option.some` -> `Option.isSome()`
+  - `Option.none` -> `Option.isNone()`
+  - `Result.ok` -> `Result.isOk()`
+  - `Result.err` -> `Result.isErr()`
+
 # 3.6.1
 
 - Improved the documentation a little bit
