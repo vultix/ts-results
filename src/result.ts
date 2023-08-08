@@ -25,8 +25,8 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * is set to value contained in `Err`.
      *
      * If you know you're dealing with `Ok` and the compiler knows it too (because you tested
-     * `ok` or `err`) you should use `val` instead. While `Ok`'s `expect()` and `val` will
-     * both return the same value using `val` is preferable because it makes it clear that
+     * `isOk()` or `isErr()`) you should use `value` instead. While `Ok`'s `expect()` and `value` will
+     * both return the same value using `value` is preferable because it makes it clear that
      * there won't be an exception thrown on access.
      *
      * @param msg the message to throw if no Ok value.
@@ -45,8 +45,8 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Instead, prefer to handle the `Err` case explicitly.
      *
      * If you know you're dealing with `Ok` and the compiler knows it too (because you tested
-     * `ok` or `err`) you should use `val` instead. While `Ok`'s `unwrap()` and `val` will
-     * both return the same value using `val` is preferable because it makes it clear that
+     * `isOk()` or `isErr()`) you should use `value` instead. While `Ok`'s `unwrap()` and `value` will
+     * both return the same value using `value` is preferable because it makes it clear that
      * there won't be an exception thrown on access.
      *
      * Throws if the value is an `Err`, with a message provided by the `Err`'s value and
