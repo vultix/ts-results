@@ -126,7 +126,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns `Ok()` if we have a value, otherwise returns `other`.
      * 
      * `other` is evaluated eagerly. If `other` is a result of a function
-     * call try `or_else()` instead – it evaluates the parameter lazily.
+     * call try `orElse()` instead – it evaluates the parameter lazily.
      * 
      * @example
      * 
@@ -136,7 +136,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     or<E2>(other: Result<T, E2>): Result<T, E2>
 
     /**
-     * Returns `Some()` if we have a value, otherwise returns the result
+     * Returns `Ok()` if we have a value, otherwise returns the result
      * of calling `other()`.
      * 
      * `other()` is called *only* when needed and is passed the error value in a parameter.

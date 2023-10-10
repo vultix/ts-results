@@ -59,7 +59,7 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
      * Maps an `Option<T>` to `Option<U>` by either converting `T` to `U` using `mapper` (in case
      * of `Some`) or using the `default_` value (in case of `None`).
      *
-     * If `default` is a result of a function call consider using `mapOrElse` instead, it will
+     * If `default` is a result of a function call consider using `mapOrElse()` instead, it will
      * only evaluate the function when needed.
      */
     mapOr<U>(default_: U, mapper: (val: T) => U): U;
@@ -74,7 +74,7 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
      * Returns `Some()` if we have a value, otherwise returns `other`.
      * 
      * `other` is evaluated eagerly. If `other` is a result of a function
-     * call try `or_else()` instead – it evaluates the parameter lazily.
+     * call try `orElse()` instead – it evaluates the parameter lazily.
      * 
      * @example
      * 
