@@ -9,3 +9,6 @@ node_modules/
 
 # test coverage
 coverage
+
+# The built documentation
+/docs/_build/
