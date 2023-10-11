@@ -254,7 +254,7 @@ Behaves the same as [elseMap](#elsemap), but takes a value instead of a function
 
 Allows you to do the same actions as the
 normal [rxjs switchMap](https://www.learnrxjs.io/operators/transformation/switchmap.html)
-and [rxjs switchMap](https://www.learnrxjs.io/operators/transformation/mergemap.html) operator on a stream of Result
+and [rxjs mergeMap](https://www.learnrxjs.io/operators/transformation/mergemap.html) operator on a stream of Result
 objects.
 
 Merging or switching from a stream of `Result<T, E>` objects onto a stream of `<T2>` objects turns the stream into a
