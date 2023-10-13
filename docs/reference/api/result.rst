@@ -21,6 +21,9 @@ Construction:
     const success = Ok('my username')
     const error = Err('error_code')
 
+``Result`` can only be combined with synchronous code. Look at :doc:`asyncresult` if you need
+to combine results with asynchronouse code.
+
 ``all()``
 ---------
 
@@ -316,6 +319,20 @@ A stack trace is generated when an ``Err`` is created.
 
     let error = Err('Uh Oh');
     let stack = error.stack;
+
+.. _toAsyncResult:
+
+``toAsyncResult()``
+-------------------
+
+.. code-block:: typescript
+
+    toAsyncResult(): AsyncResult<T, E>
+
+Creates an `AsyncResult` based on this `Result`.
+
+Useful when you need to compose results with asynchronous code.
+
 
 ``toOption()``
 --------------

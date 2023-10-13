@@ -255,3 +255,9 @@ test('or / orElse', () => {
     expect(Ok(1).or(Ok(2))).toEqual(Ok(1))
     expect(Ok(1).orElse((_error) => {throw new Error('Call unexpected')})).toEqual(Ok(1))
 })
+
+test('toAsyncResult()', async () => {
+    expect(await Ok(1).toAsyncResult().promise).toEqual(Ok(1))
+    const err = Err('error')
+    expect(await err.toAsyncResult().promise).toEqual(err)
+})

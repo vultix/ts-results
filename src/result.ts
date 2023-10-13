@@ -1,5 +1,6 @@
 import { toString } from './utils.js';
 import { Option, None, Some } from './option.js';
+import { AsyncResult } from './asyncresult.js'
 
 /*
  * Missing Rust Result type methods:
@@ -154,6 +155,13 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      *  Similar to rust's `ok` method
      */
     toOption(): Option<T>;
+
+    /**
+     * Creates an `AsyncResult` based on this `Result`.
+     *
+     * Useful when you need to compose results with asynchronous code.
+     */
+    toAsyncResult(): AsyncResult<T, E>
 }
 
 /**
@@ -270,6 +278,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
 
     get stack(): string | undefined {
         return `${this}\n${this._stack}`;
+    }
+
+    toAsyncResult(): AsyncResult<never, E> {
+        return new AsyncResult(this)
     }
 }
 
@@ -397,6 +409,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     toString(): string {
         return `Ok(${toString(this.value)})`;
+    }
+
+    toAsyncResult(): AsyncResult<T, never> {
+        return new AsyncResult(this)
     }
 }
 
