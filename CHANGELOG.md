@@ -1,4 +1,4 @@
-# Not released yet
+# 4.1.0-alpha.1
 
 - A whole bunch of documentation changes
 - Introduced `AsyncResult` to allow composing results with asynchronous code
