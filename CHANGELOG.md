@@ -1,3 +1,9 @@
+# Not released yet
+
+- A whole bunch of documentation changes
+- Introduced `AsyncResult` to allow composing results with asynchronous code
+  (two composition methods implemented: `andThen()` and `map()`)
+
 # 4.0.0
 
 - Improved the documentation
