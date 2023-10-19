@@ -78,6 +78,10 @@ class NoneImpl implements BaseOption<never> {
         return this;
     }
 
+    or<T2>(other: Option<T2>): Option<T2> {
+        return other;
+    }
+
     andThen<T2>(op: unknown): None {
         return this;
     }
@@ -151,6 +155,10 @@ class SomeImpl<T> implements BaseOption<T> {
         return mapper(this.val);
     }
 
+    or(other: Option<T>): Option<T> {
+        return this;
+    }
+
     toResult<E>(error: E): Ok<T> {
         return Ok(this.val);
     }
@@ -213,7 +221,7 @@ export namespace Option {
             if (option.some) {
                 return option as Some<OptionSomeTypes<T>[number]>;
             } else {
-                return option as None;
+                continue;
             }
         }
 
