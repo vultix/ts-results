@@ -59,6 +59,11 @@ test('expect', () => {
     }).toThrowError('should fail!');
 });
 
+test('expectErr', () => {
+    const err = Err(true);
+    expect(err.expectErr('Error message')).toBe(true);
+});
+
 test('unwrap', () => {
     expect(() => {
         const err = Err({ message: 'bad error' }).unwrap();

@@ -59,6 +59,14 @@ test('expect', () => {
     eq<boolean, typeof val>(true);
 });
 
+test('expectErr', () => {
+    const ok = Ok(true);
+    const errorMsg = 'Error message';
+    expect(() => {
+        ok.expectErr(errorMsg);
+    }).toThrow(errorMsg);
+});
+
 test('unwrap', () => {
     const val = Ok(true).unwrap();
     expect(val).toBe(true);
