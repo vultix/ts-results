@@ -309,7 +309,7 @@ export namespace Option {
             if (option.isSome()) {
                 return option as Some<OptionSomeTypes<T>[number]>;
             } else {
-                return option as None;
+                continue;
             }
         }
 

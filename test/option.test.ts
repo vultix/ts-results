@@ -104,6 +104,7 @@ test('all / any', () => {
     expect(Option.any(...options)).toEqual(Some('foo'));
     expect(Option.any(...options, None)).toEqual(Some('foo'));
     expect(Option.any(None, None)).toEqual(None);
+    expect(Option.any(None, Some('foo'))).toEqual(Some('foo'));
     expect(Option.any()).toEqual(None);
 });
 
