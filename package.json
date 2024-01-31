@@ -14,12 +14,12 @@
   "module": "dist/esm/index.js",
   "exports": {
       ".": {
-          "import": "./dist/esm/index.js",
-          "require": "./dist/cjs/index.js"
+          "require": "./dist/cjs/index.js",
+          "import": "./dist/esm/index.js"
       },
       "./rxjs-operators": {
-        "import": "./dist/esm/rxjs-operators/index.js",
-        "require": "./dist/cjs/rxjs-operators/index.js"
+        "require": "./dist/cjs/rxjs-operators/index.js",
+        "import": "./dist/esm/rxjs-operators/index.js"
       }
   },
   "repository": {
